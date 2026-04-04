@@ -19,6 +19,7 @@ export class SettingsPanel {
     this.#engine = engine;
     this.#sound = sound;
     this.#build();
+    if (window.matchMedia('(max-width: 768px)').matches) this.#collapse();
     this.#bus.on('typing:start', () => this.#collapse());
   }
 

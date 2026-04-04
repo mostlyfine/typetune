@@ -176,3 +176,15 @@
   border-top: 1px solid var(--key-border);
   margin: 2px 0;
 }
+
+@media (max-width: 768px) {
+  .sp-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sp-group {
+    flex: 1;
+    min-width: 0;
+  }
+}

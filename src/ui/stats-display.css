@@ -75,3 +75,13 @@
 .result-retry:hover {
   opacity: 0.85;
 }
+
+@media (max-width: 768px) {
+  .stats-bar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .result-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

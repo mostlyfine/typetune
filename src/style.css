@@ -78,3 +78,15 @@ body {
   flex-direction: column;
   gap: 16px;
 }
+
+@media (max-width: 768px) {
+  #app {
+    flex-direction: column;
+    padding: 16px 12px;
+  }
+
+  #sidebar {
+    width: 100%;
+    flex-shrink: 1;
+  }
+}
