@@ -29,6 +29,7 @@ export class SettingsPanel {
         <div class="sp-header-actions">
           <button id="sp-start" class="sp-start-btn">Start</button>
           <button id="sp-sound" class="sp-sound-btn">Sound: ON</button>
+          <button id="sp-theme" class="sp-theme-btn">Light</button>
         </div>
       </div>
       <div class="sp-bar">
@@ -125,6 +126,13 @@ export class SettingsPanel {
       this.#sound.toggle();
       soundBtn.textContent = this.#sound.enabled ? 'Sound: ON' : 'Sound: OFF';
       soundBtn.classList.toggle('sp-sound-off', !this.#sound.enabled);
+    });
+
+    const themeBtn = this.#container.querySelector('#sp-theme');
+    themeBtn.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      document.documentElement.setAttribute('data-theme', isLight ? '' : 'light');
+      themeBtn.textContent = isLight ? 'Light' : 'Dark';
     });
 
     // Text source

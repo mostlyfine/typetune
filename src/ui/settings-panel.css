@@ -47,7 +47,8 @@
   opacity: 0.9;
 }
 
-.sp-sound-btn {
+.sp-sound-btn,
+.sp-theme-btn {
   background: var(--bg-overlay);
   color: var(--text);
   border: 1px solid var(--key-border);
@@ -58,7 +59,8 @@
   white-space: nowrap;
 }
 
-.sp-sound-btn:hover {
+.sp-sound-btn:hover,
+.sp-theme-btn:hover {
   border-color: var(--accent);
 }
 

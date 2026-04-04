@@ -19,6 +19,25 @@
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+[data-theme="light"] {
+  --bg: #eff1f5;
+  --bg-surface: #e6e9ef;
+  --bg-overlay: #dce0e8;
+  --text: #4c4f69;
+  --text-dim: #9ca0b0;
+  --text-bright: #1e1e2e;
+  --accent: #1e66f5;
+  --accent-dim: #bcc0cc;
+  --green: #40a02b;
+  --red: #d20f39;
+  --yellow: #df8e1d;
+  --key-bg: #dce0e8;
+  --key-border: #bcc0cc;
+  --key-highlight: #1e66f5;
+  --finger-active: #1e66f5;
+  --finger-inactive: #ccd0da;
+}
+
 *,
 *::before,
 *::after {
