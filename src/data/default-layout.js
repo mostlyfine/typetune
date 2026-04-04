@@ -1,0 +1,82 @@
+// Standard QWERTY keyboard layout
+// Each key: { code: ZMK keycode, w: width multiplier (1 = standard key) }
+export const QWERTY_LAYOUT = {
+  name: 'QWERTY (Standard)',
+  rows: [
+    // Row 0: Number row
+    [
+      { code: 'GRAVE', w: 1 },
+      { code: 'N1', w: 1 },
+      { code: 'N2', w: 1 },
+      { code: 'N3', w: 1 },
+      { code: 'N4', w: 1 },
+      { code: 'N5', w: 1 },
+      { code: 'N6', w: 1 },
+      { code: 'N7', w: 1 },
+      { code: 'N8', w: 1 },
+      { code: 'N9', w: 1 },
+      { code: 'N0', w: 1 },
+      { code: 'MINUS', w: 1 },
+      { code: 'EQUAL', w: 1 },
+      { code: 'BSPC', w: 1.5 },
+    ],
+    // Row 1: Top alpha
+    [
+      { code: 'TAB', w: 1.5 },
+      { code: 'Q', w: 1 },
+      { code: 'W', w: 1 },
+      { code: 'E', w: 1 },
+      { code: 'R', w: 1 },
+      { code: 'T', w: 1 },
+      { code: 'Y', w: 1 },
+      { code: 'U', w: 1 },
+      { code: 'I', w: 1 },
+      { code: 'O', w: 1 },
+      { code: 'P', w: 1 },
+      { code: 'LBKT', w: 1 },
+      { code: 'RBKT', w: 1 },
+      { code: 'BSLH', w: 1 },
+    ],
+    // Row 2: Home row
+    [
+      { code: 'CAPS', w: 1.75 },
+      { code: 'A', w: 1 },
+      { code: 'S', w: 1 },
+      { code: 'D', w: 1 },
+      { code: 'F', w: 1 },
+      { code: 'G', w: 1 },
+      { code: 'H', w: 1 },
+      { code: 'J', w: 1 },
+      { code: 'K', w: 1 },
+      { code: 'L', w: 1 },
+      { code: 'SEMI', w: 1 },
+      { code: 'SQT', w: 1 },
+      { code: 'ENTER', w: 1.75 },
+    ],
+    // Row 3: Bottom alpha
+    [
+      { code: 'LSHIFT', w: 2.25 },
+      { code: 'Z', w: 1 },
+      { code: 'X', w: 1 },
+      { code: 'C', w: 1 },
+      { code: 'V', w: 1 },
+      { code: 'B', w: 1 },
+      { code: 'N', w: 1 },
+      { code: 'M', w: 1 },
+      { code: 'COMMA', w: 1 },
+      { code: 'DOT', w: 1 },
+      { code: 'FSLH', w: 1 },
+      { code: 'RSHIFT', w: 2.25 },
+    ],
+    // Row 4: Space bar
+    [
+      { code: 'LCTRL', w: 1.5 },
+      { code: 'LGUI', w: 1.25 },
+      { code: 'LALT', w: 1.25 },
+      { code: 'SPACE', w: 6.25 },
+      { code: 'RALT', w: 1.25 },
+      { code: 'RGUI', w: 1.25 },
+      { code: 'RCTRL', w: 1.5 },
+    ],
+  ],
+};

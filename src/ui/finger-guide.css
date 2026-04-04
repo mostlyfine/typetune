@@ -1,0 +1,36 @@
+#finger-guide {
+  display: flex;
+  justify-content: center;
+}
+
+.fg-wrapper {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.fg-svg {
+  width: 100%;
+  height: auto;
+}
+
+.fg-palm {
+  fill: var(--bg-overlay);
+  stroke: var(--key-border);
+  stroke-width: 1;
+}
+
+.fg-finger rect,
+.fg-finger ellipse {
+  fill: var(--finger-inactive);
+  stroke: var(--key-border);
+  stroke-width: 1;
+  transition: fill 0.15s;
+}
+
+.fg-finger.fg-active rect,
+.fg-finger.fg-active ellipse {
+  fill: var(--finger-active);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}

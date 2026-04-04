@@ -1,0 +1,78 @@
+#keyboard {
+  display: flex;
+  justify-content: center;
+}
+
+.kb {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: var(--bg-surface);
+  border-radius: 12px;
+}
+
+.kb-row {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.kb-key {
+  --w: 1;
+  width: calc(var(--w) * 44px);
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--key-bg);
+  border: 1px solid var(--key-border);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  user-select: none;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.kb-key.kb-highlight {
+  background: var(--key-highlight);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(137, 180, 250, 0.3);
+}
+
+.kb-shift-label {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--text-dim);
+  position: absolute;
+  top: 4px;
+  left: 6px;
+}
+
+.kb-highlight .kb-shift-label {
+  color: var(--bg-overlay);
+}
+
+.kb-main-label {
+  font-size: 14px;
+}
+
+/* Gap/spacer for split keyboards */
+.kb-key.kb-gap {
+  background: none;
+  border: none;
+  pointer-events: none;
+}
+
+/* Layer/unknown keys (dimmed) */
+.kb-key.kb-layer,
+.kb-key.kb-unknown {
+  opacity: 0.4;
+  font-size: 10px;
+}
