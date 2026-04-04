@@ -97,6 +97,13 @@ const HID_TO_INTERNAL = {
   0x46: 'PSCRN', 0x47: 'SLCK', 0x48: 'PAUSE',
   0x49: 'INS', 0x4A: 'HOME', 0x4B: 'PG_UP', 0x4C: 'DEL', 0x4D: 'END', 0x4E: 'PG_DN',
   0x4F: 'RIGHT', 0x50: 'LEFT', 0x51: 'DOWN', 0x52: 'UP',
+  // Numpad
+  0x53: 'NUM_LOCK',
+  0x54: 'KP_SLASH', 0x55: 'KP_STAR', 0x56: 'KP_MINUS', 0x57: 'KP_PLUS',
+  0x58: 'KP_ENTER',
+  0x59: 'KP_N1', 0x5A: 'KP_N2', 0x5B: 'KP_N3', 0x5C: 'KP_N4',
+  0x5D: 'KP_N5', 0x5E: 'KP_N6', 0x5F: 'KP_N7', 0x60: 'KP_N8',
+  0x61: 'KP_N9', 0x62: 'KP_N0', 0x63: 'KP_DOT',
   // Left modifiers
   0xE0: 'LCTRL', 0xE1: 'LSHIFT', 0xE2: 'LALT', 0xE3: 'LGUI',
   // Right modifiers
@@ -232,6 +239,12 @@ export function decodeVialKeycode(num) {
   if ((num & 0xFF00) === 0x5300) {
     const layer = num & 0xFF;
     return { code: `TG(${layer})`, w: 1, isLayer: true };
+  }
+
+  // TT(layer) — 0x5400-0x54FF
+  if ((num & 0xFF00) === 0x5400) {
+    const layer = num & 0xFF;
+    return { code: `TT(${layer})`, w: 1, isLayer: true };
   }
 
   // TO(layer) — 0x5200-0x52FF

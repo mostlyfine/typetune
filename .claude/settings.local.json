@@ -5,7 +5,11 @@
       "WebFetch(domain:zmk.dev)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:api.github.com)",
-      "WebFetch(domain:caniusevia.com)"
+      "WebFetch(domain:caniusevia.com)",
+      "WebFetch(domain:get.vial.today)",
+      "WebFetch(domain:www.caniusevia.com)",
+      "WebFetch(domain:docs.qmk.fm)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

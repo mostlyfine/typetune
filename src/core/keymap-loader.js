@@ -28,6 +28,15 @@ export class KeymapLoader {
     if (ext === '.keymap' || ext === '.dtsi') return { format: 'zmk', parsed: null };
     if (ext === '.c' || ext === '.h') return { format: 'qmk', parsed: null };
 
+    if (ext === '.vil') {
+      try {
+        const data = JSON.parse(text);
+        return { format: 'vial', parsed: data };
+      } catch {
+        throw new Error('Invalid .vil file: not valid JSON');
+      }
+    }
+
     if (ext === '.json') {
       return this.#detectJsonFormat(text);
     }
