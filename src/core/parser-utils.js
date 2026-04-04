@@ -1,6 +1,6 @@
 // Shared utilities for keymap parsers
 
-const GAP_KEY = { code: '_GAP', w: 0.5, isGap: true };
+export const GAP_KEY = { code: '_GAP', w: 0.5, isGap: true };
 
 export function removeComments(text) {
   return text

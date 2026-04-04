@@ -2,6 +2,7 @@ export class Sound {
   #bus;
   #ctx;
   #enabled = true;
+  #clickBuffer = null;
 
   constructor(bus) {
     this.#bus = bus;
@@ -28,17 +29,17 @@ export class Sound {
     const ctx = this.#ensureCtx();
     const t = ctx.currentTime;
 
-    // Noise burst for typewriter click
-    const bufferSize = ctx.sampleRate * 0.03;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+    if (!this.#clickBuffer) {
+      const bufferSize = ctx.sampleRate * 0.03;
+      this.#clickBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = this.#clickBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+      }
     }
     const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
+    noise.buffer = this.#clickBuffer;
 
-    // Bandpass filter to shape the click
     const filter = ctx.createBiquadFilter();
     filter.type = 'bandpass';
     filter.frequency.value = 3000;
@@ -60,7 +61,6 @@ export class Sound {
     const ctx = this.#ensureCtx();
     const t = ctx.currentTime;
 
-    // Low buzzer
     const osc = ctx.createOscillator();
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(150, t);

@@ -1,5 +1,5 @@
 import { decodeVialKeycode, resolveQmkKeycode, splitIntoRows } from '../data/qmk-keycodes.js';
-import { buildSplitLayout } from './parser-utils.js';
+import { GAP_KEY, buildSplitLayout } from './parser-utils.js';
 import { ViaParser } from './via-parser.js';
 import { ZMK_KEY_MAP } from '../data/key-labels.js';
 
@@ -114,7 +114,6 @@ export class VialParser {
     const cleanLeft = stripCols(leftRows, leftEncCols);
     const cleanRight = stripCols(rightRows, rightEncCols);
 
-    const GAP_KEY = { code: '_GAP', w: 0.5, isGap: true };
     const BLANK_KEY = { code: '_GAP', w: 1, isGap: true };
     const resolveKey = kc => kc === -1 ? BLANK_KEY : resolveQmkKeycode(kc);
 
@@ -184,19 +183,15 @@ export class VialParser {
       const layerLeft = stripCols(layer.slice(0, half), leftEncCols);
       const layerRight = stripCols(layer.slice(half), rightEncCols);
 
-      for (let i = 0; i < half; i++) {
-        for (let c = 0; c < layerLeft[i].length; c++) {
-          const lk = resolve(layerLeft[i][c]);
-          const bk = resolve(baseLeft[i][c]);
-          if (lk && bk && !lk.isTrans && !lk.isNone && !lk.isLayer) {
-            this.#addCharEntry(charMap, lk.code, bk.code, act, baseChars);
-          }
-        }
-        for (let c = 0; c < layerRight[i].length; c++) {
-          const lk = resolve(layerRight[i][c]);
-          const bk = resolve(baseRight[i][c]);
-          if (lk && bk && !lk.isTrans && !lk.isNone && !lk.isLayer) {
-            this.#addCharEntry(charMap, lk.code, bk.code, act, baseChars);
+      const scanPairs = [[layerLeft, baseLeft], [layerRight, baseRight]];
+      for (const [layerRows, baseRows] of scanPairs) {
+        for (let i = 0; i < half; i++) {
+          for (let c = 0; c < layerRows[i].length; c++) {
+            const lk = resolve(layerRows[i][c]);
+            const bk = resolve(baseRows[i][c]);
+            if (lk && bk && !lk.isTrans && !lk.isNone && !lk.isLayer) {
+              this.#addCharEntry(charMap, lk.code, bk.code, act, baseChars);
+            }
           }
         }
       }

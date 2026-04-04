@@ -1,5 +1,12 @@
 import { REPOS } from '../data/repo-list.js';
 
+const FUNC_PATTERNS = [
+  /^(export\s+)?(default\s+)?(async\s+)?function\s/,
+  /^func[\s(]/,
+  /^(pub(\s*\(\w+\))?\s+)?(async\s+)?(unsafe\s+)?fn\s/,
+  /^(async\s+)?def\s/,
+];
+
 export class TextProvider {
   #bus;
 
@@ -69,17 +76,103 @@ export class TextProvider {
   }
 
   #processText(text) {
-    return text
+    const cleaned = text
       .replace(/\r\n/g, '\n')
-      .replace(/\/\*[\s\S]*?\*\//g, '')        // remove /* block comments */
-      .replace(/^[ \t]*\/\/.*$/gm, '')          // remove // line comments
-      .replace(/^[ \t]*#(?!!|include).*$/gm, '') // remove # line comments (not #! or #include)
-      .split('\n')
-      .map(line => line.replace(/\t/g, '  '))   // convert tabs to 2 spaces
-      .filter(line => line.trim().length > 0)    // remove blank lines
-      .slice(0, 50)
-      .join('\n')
-      .trim();
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^[ \t]*import\s*\([\s\S]*?\n[ \t]*\)/gm, '')
+      .replace(/^[ \t]*import\s*\{[\s\S]*?\}\s*from\b.*$/gm, '')
+      .replace(/^[ \t]*from\s+\S+\s+import\s*\([\s\S]*?\)/gm, '')
+      .replace(/^[ \t]*use\s+\S+::\{[\s\S]*?\};\s*$/gm, '')
+      .replace(/^[ \t]*\/\/.*$/gm, '')
+      .replace(/^[ \t]*#(?![!]|include).*$/gm, '')
+      .replace(/^[ \t]*import\b.*$/gm, '')
+      .replace(/^[ \t]*from\s+\S+\s+import\b.*$/gm, '')
+      .replace(/^[ \t]*(require|require_relative|require_once|include_once)\b.*$/gm, '')
+      .replace(/^[ \t]*include\s+['"].*$/gm, '')
+      .replace(/^[ \t]*use\s+\S+;\s*$/gm, '')
+      .replace(/^[ \t]*using\s+\S+.*;\s*$/gm, '')
+      .replace(/^[ \t]*extern\s+crate\b.*$/gm, '');
+
+    const lines = cleaned.split('\n')
+      .map(line => line.replace(/\t/g, '  '))
+      .filter(line => line.trim().length > 0);
+
+    return this.#extractFunctions(lines).slice(0, 50).join('\n').trim();
+  }
+
+  #extractFunctions(lines) {
+    const blocks = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      if (this.#isFuncStart(lines[i])) {
+        const { result, end } = this.#extractBlock(lines, i);
+        blocks.push(...result);
+        i = end + 1;
+        if (blocks.length >= 50) break;
+      } else {
+        i++;
+      }
+    }
+
+    return blocks.length > 0 ? blocks : lines;
+  }
+
+  #isFuncStart(line) {
+    const t = line.trimStart();
+    if (FUNC_PATTERNS.some(p => p.test(t))) return true;
+    if (/^(public|private|protected|internal)\s+/.test(t) &&
+        /\w+\s*\(/.test(t) &&
+        !/\b(class|interface|struct|enum|record|delegate|namespace)\b/.test(t)) return true;
+    return false;
+  }
+
+  #extractBlock(lines, start) {
+    // Python/Ruby: indentation-based (def without opening brace)
+    if (/^\s*(async\s+)?def\s/.test(lines[start]) && !lines[start].includes('{')) {
+      return this.#extractIndentBlock(lines, start);
+    }
+    return this.#extractBraceBlock(lines, start);
+  }
+
+  #extractBraceBlock(lines, start) {
+    let depth = 0;
+    let opened = false;
+    const result = [];
+
+    for (let i = start; i < lines.length; i++) {
+      result.push(lines[i]);
+      for (const ch of lines[i]) {
+        if (ch === '{') { depth++; opened = true; }
+        if (ch === '}') depth--;
+      }
+      if (opened && depth <= 0) {
+        return { result, end: i };
+      }
+    }
+
+    if (!opened) return { result: [lines[start]], end: start };
+    return { result, end: lines.length - 1 };
+  }
+
+  #extractIndentBlock(lines, start) {
+    const result = [lines[start]];
+    const baseIndent = lines[start].search(/\S/);
+
+    for (let i = start + 1; i < lines.length; i++) {
+      const indent = lines[i].search(/\S/);
+      if (indent >= 0 && indent <= baseIndent) {
+        // Ruby: include closing 'end'
+        if (lines[i].trim() === 'end') {
+          result.push(lines[i]);
+          return { result, end: i };
+        }
+        return { result, end: i - 1 };
+      }
+      result.push(lines[i]);
+    }
+
+    return { result, end: lines.length - 1 };
   }
 
   #guessLanguage(filename) {
