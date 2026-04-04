@@ -11,17 +11,31 @@ export class TextProvider {
     const repos = REPOS[language];
     if (!repos || repos.length === 0) throw new Error(`No repos for language: ${language}`);
 
-    const repo = repos[Math.floor(Math.random() * repos.length)];
-    const file = repo.files[Math.floor(Math.random() * repo.files.length)];
-    const url = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${repo.branch}/${file}`;
+    // Build shuffled list of all repo/file candidates
+    const candidates = repos.flatMap(repo =>
+      repo.files.map(file => ({ repo, file }))
+    );
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
 
-    const text = await this.#fetch(url);
-    const processed = this.#processText(text);
-    this.#bus.emit('text:loaded', {
-      text: processed,
-      language,
-      source: `${repo.owner}/${repo.repo}/${file}`,
-    });
+    for (const { repo, file } of candidates) {
+      const url = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${repo.branch}/${file}`;
+      try {
+        const text = await this.#fetch(url);
+        const processed = this.#processText(text);
+        this.#bus.emit('text:loaded', {
+          text: processed,
+          language,
+          source: `${repo.owner}/${repo.repo}/${file}`,
+        });
+        return;
+      } catch {
+        // try next candidate
+      }
+    }
+    throw new Error(`All sources failed for ${language}`);
   }
 
   loadFromFile(file) {

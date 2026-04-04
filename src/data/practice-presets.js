@@ -508,6 +508,7 @@ function charsForHand(side) {
 
 const NUMBER_CHARS = '0123456789'.split('');
 const SYMBOL_CHARS = '!@#$%^&*()_+-=[]{}|;:\'",.<>?/\\`~'.split('');
+const NUM_SYMBOL_CHARS = [...NUMBER_CHARS, ...SYMBOL_CHARS];
 
 // Filter words allowing at most `maxMiss` characters outside the allowed set
 function filterWords(allowedChars, maxMiss = 0) {
@@ -522,13 +523,29 @@ function filterWords(allowedChars, maxMiss = 0) {
   });
 }
 
+// Generate random chunks from character set (for numbers/symbols)
+function buildChunks(chars, length) {
+  const result = [];
+  let totalLen = 0;
+  while (totalLen < length) {
+    const chunkLen = 3 + Math.floor(Math.random() * 5); // 3-7 chars
+    let chunk = '';
+    for (let i = 0; i < chunkLen; i++) {
+      chunk += chars[Math.floor(Math.random() * chars.length)];
+    }
+    result.push(chunk);
+    totalLen += chunk.length + 1;
+  }
+  return result.join(' ');
+}
+
 // Generate practice text using only real words
 function buildText(allowedChars, length) {
   // Try exact match first, then allow 1 miss, then 2
   let words = filterWords(allowedChars, 0);
   if (words.length < 10) words = filterWords(allowedChars, 1);
   if (words.length < 10) words = filterWords(allowedChars, 2);
-  if (words.length === 0) return '';
+  if (words.length === 0) return buildChunks(allowedChars, length);
 
   const result = [];
   let totalLen = 0;
@@ -541,18 +558,17 @@ function buildText(allowedChars, length) {
 }
 
 export const PRESETS = {
-  'right-hand':  { name: 'Right Hand', keys: () => charsForHand('right') },
-  'left-hand':   { name: 'Left Hand',  keys: () => charsForHand('left') },
-  'numbers':     { name: 'Numbers',    keys: () => NUMBER_CHARS },
-  'symbols':     { name: 'Symbols',    keys: () => SYMBOL_CHARS },
-  'l-pinky':     { name: 'Left Pinky',   keys: () => charsForFinger(FINGERS.L_PINKY) },
-  'l-ring':      { name: 'Left Ring',    keys: () => charsForFinger(FINGERS.L_RING) },
-  'l-middle':    { name: 'Left Middle',  keys: () => charsForFinger(FINGERS.L_MIDDLE) },
-  'l-index':     { name: 'Left Index',   keys: () => charsForFinger(FINGERS.L_INDEX) },
-  'r-index':     { name: 'Right Index',  keys: () => charsForFinger(FINGERS.R_INDEX) },
-  'r-middle':    { name: 'Right Middle', keys: () => charsForFinger(FINGERS.R_MIDDLE) },
-  'r-ring':      { name: 'Right Ring',   keys: () => charsForFinger(FINGERS.R_RING) },
-  'r-pinky':     { name: 'Right Pinky',  keys: () => charsForFinger(FINGERS.R_PINKY) },
+  'right-hand':    { name: 'Right Hand',        keys: () => charsForHand('right') },
+  'left-hand':     { name: 'Left Hand',         keys: () => charsForHand('left') },
+  'num-symbols':   { name: 'Numbers & Symbols', keys: () => NUM_SYMBOL_CHARS },
+  'l-pinky':       { name: 'Left Pinky',        keys: () => charsForFinger(FINGERS.L_PINKY) },
+  'l-ring':        { name: 'Left Ring',         keys: () => charsForFinger(FINGERS.L_RING) },
+  'l-middle':      { name: 'Left Middle',       keys: () => charsForFinger(FINGERS.L_MIDDLE) },
+  'l-index':       { name: 'Left Index',        keys: () => charsForFinger(FINGERS.L_INDEX) },
+  'r-index':       { name: 'Right Index',       keys: () => charsForFinger(FINGERS.R_INDEX) },
+  'r-middle':      { name: 'Right Middle',      keys: () => charsForFinger(FINGERS.R_MIDDLE) },
+  'r-ring':        { name: 'Right Ring',        keys: () => charsForFinger(FINGERS.R_RING) },
+  'r-pinky':       { name: 'Right Pinky',       keys: () => charsForFinger(FINGERS.R_PINKY) },
 };
 
 export function generatePracticeText(keys, length = 200) {
