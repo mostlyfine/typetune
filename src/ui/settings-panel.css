@@ -168,7 +168,8 @@
 .sp-file-input {
   font-size: 11px;
   color: var(--text-dim);
-  max-width: 100%;
+  min-width: 0;
+  flex: 1;
 }
 
 .sp-file-input::file-selector-button {

@@ -92,6 +92,13 @@ export const ZMK_KEY_MAP = {
   KP_N4: { label: 'KP 4', char: '4' }, KP_N5: { label: 'KP 5', char: '5' },
   KP_N6: { label: 'KP 6', char: '6' }, KP_N7: { label: 'KP 7', char: '7' },
   KP_N8: { label: 'KP 8', char: '8' }, KP_N9: { label: 'KP 9', char: '9' },
+  KP_SLASH: { label: 'KP /', char: '/' }, KP_STAR: { label: 'KP *', char: '*' },
+  KP_MINUS: { label: 'KP -', char: '-' }, KP_PLUS: { label: 'KP +', char: '+' },
+  KP_DOT: { label: 'KP .', char: '.' }, KP_ENTER: { label: 'KP Ent', char: '\n' },
+  // Lock keys
+  NUM_LOCK: { label: 'NumLk' },
+  // Media
+  MUTE: { label: 'Mute' }, VOLD: { label: 'Vol-' }, VOLU: { label: 'Vol+' },
 };
 
 // Reverse lookup: char -> { code, shift }

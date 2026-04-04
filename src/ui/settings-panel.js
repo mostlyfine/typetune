@@ -1,6 +1,6 @@
 import { LANGUAGES } from '../data/repo-list.js';
 import { PRESETS, generatePracticeText } from '../data/practice-presets.js';
-import { ZmkParser } from '../core/zmk-parser.js';
+import { KeymapLoader } from '../core/keymap-loader.js';
 import './settings-panel.css';
 
 export class SettingsPanel {
@@ -9,7 +9,7 @@ export class SettingsPanel {
   #textProvider;
   #engine;
   #sound;
-  #zmkParser = new ZmkParser();
+  #keymapLoader = new KeymapLoader();
   #collapsed = false;
 
   constructor(bus, container, textProvider, engine, sound) {
@@ -74,8 +74,8 @@ export class SettingsPanel {
         <div class="sp-row">
           <div class="sp-group">
             <label class="sp-label">Keymap</label>
-            <input id="sp-keymap-file" type="file" class="sp-file-input" accept=".keymap,.dtsi">
-            <button id="sp-keymap-reset" class="sp-btn" hidden>Reset</button>
+            <input id="sp-keymap-file" type="file" class="sp-file-input" accept=".keymap,.dtsi,.json,.c">
+            <button id="sp-keymap-reset" class="sp-btn">Reset</button>
           </div>
         </div>
       </div>
@@ -208,8 +208,7 @@ export class SettingsPanel {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        this.#loadKeymap(reader.result);
-        keymapResetBtn.hidden = false;
+        this.#loadKeymap(reader.result, file.name);
       };
       reader.readAsText(file);
     });
@@ -217,13 +216,12 @@ export class SettingsPanel {
     keymapResetBtn.addEventListener('click', () => {
       this.#bus.emit('layout:changed', { layout: null });
       keymapFileInput.value = '';
-      keymapResetBtn.hidden = true;
     });
   }
 
-  #loadKeymap(text) {
+  #loadKeymap(text, filename = '') {
     try {
-      const result = this.#zmkParser.parse(text);
+      const result = this.#keymapLoader.load(text, filename);
       this.#bus.emit('layout:changed', { layout: result.layout });
     } catch (e) {
       alert(`Failed to parse keymap: ${e.message}`);

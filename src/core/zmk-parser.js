@@ -1,4 +1,5 @@
 import { ZMK_KEY_MAP } from '../data/key-labels.js';
+import { removeComments, buildSplitLayout } from './parser-utils.js';
 
 // ZMK keycode aliases -> canonical form used in ZMK_KEY_MAP
 const ZMK_ALIASES = {
@@ -44,7 +45,7 @@ const ZMK_ALIASES = {
 
 export class ZmkParser {
   parse(text) {
-    const cleaned = this.#removeComments(text);
+    const cleaned = removeComments(text);
     const layers = this.#extractLayers(cleaned);
 
     if (layers.length === 0) {
@@ -59,12 +60,6 @@ export class ZmkParser {
       layers,
       layout,
     };
-  }
-
-  #removeComments(text) {
-    return text
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/\/\/.*/g, '');
   }
 
   #extractLayers(text) {
@@ -113,17 +108,9 @@ export class ZmkParser {
     return tokens;
   }
 
-  // Build layout directly from row structure — no preset needed
   #buildLayoutFromRows(bindingRows) {
-    const rows = [];
-    for (const bindings of bindingRows) {
-      const keys = bindings.map(b => this.#bindingToKey(b));
-      const half = Math.ceil(keys.length / 2);
-      const left = keys.slice(0, half);
-      const right = keys.slice(half);
-      rows.push([...left, { code: '_GAP', w: 0.5, isGap: true }, ...right]);
-    }
-    return { name: 'ZMK Custom', rows };
+    const rows = bindingRows.map(bindings => bindings.map(b => this.#bindingToKey(b)));
+    return buildSplitLayout(rows, 'ZMK Custom');
   }
 
   #bindingToKey(binding) {
