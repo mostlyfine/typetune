@@ -180,20 +180,20 @@ export class TypingEngine {
 
   #calcStats() {
     const elapsedSec = this.#startTime ? (Date.now() - this.#startTime) / 1000 : 0;
-    const tpm = elapsedSec > 0 ? Math.round(this.#correctCount / (elapsedSec / 60)) : 0;
+    const wpm = elapsedSec > 0 ? Math.round((this.#correctCount / 5) / (elapsedSec / 60)) : 0;
     const accuracy = this.#inputCount > 0
       ? Math.round((this.#correctCount / this.#inputCount) * 1000) / 10
       : 100;
-    return { tpm, accuracy, elapsedSec };
+    return { wpm, accuracy, elapsedSec };
   }
 
   #emitProgress() {
-    const { tpm, accuracy } = this.#calcStats();
+    const { wpm, accuracy } = this.#calcStats();
 
     this.#bus.emit('typing:progress', {
       position: this.#position,
       total: this.#text.length,
-      tpm,
+      wpm,
       accuracy,
       errors: this.#errors.length,
       correctCount: this.#correctCount,
@@ -230,10 +230,10 @@ export class TypingEngine {
   }
 
   #complete() {
-    const { tpm, accuracy, elapsedSec } = this.#calcStats();
+    const { wpm, accuracy, elapsedSec } = this.#calcStats();
     this.stop();
     this.#bus.emit('typing:complete', {
-      tpm,
+      wpm,
       accuracy,
       errors: this.#errors.length,
       duration: Math.round(elapsedSec * 10) / 10,

@@ -26,29 +26,53 @@ export class Sound {
   #playKey() {
     if (!this.#enabled) return;
     const ctx = this.#ensureCtx();
-    const osc = ctx.createOscillator();
+    const t = ctx.currentTime;
+
+    // Noise burst for typewriter click
+    const bufferSize = ctx.sampleRate * 0.03;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    // Bandpass filter to shape the click
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 3000;
+    filter.Q.value = 0.8;
+
     const gain = ctx.createGain();
-    osc.connect(gain);
+    gain.gain.setValueAtTime(0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+
+    noise.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
-    osc.frequency.value = 800;
-    gain.gain.value = 0.05;
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.05);
+    noise.start(t);
+    noise.stop(t + 0.04);
   }
 
   #playError() {
     if (!this.#enabled) return;
     const ctx = this.#ensureCtx();
+    const t = ctx.currentTime;
+
+    // Low buzzer
     const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, t);
+    osc.frequency.linearRampToValueAtTime(100, t + 0.15);
+
     const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.1, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.frequency.value = 300;
-    osc.type = 'square';
-    gain.gain.value = 0.08;
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.15);
+    osc.start(t);
+    osc.stop(t + 0.2);
   }
 }

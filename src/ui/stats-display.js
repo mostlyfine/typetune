@@ -18,8 +18,8 @@ export class StatsDisplay {
     this.#container.innerHTML = `
       <div class="stats-bar">
         <div class="stat">
-          <span class="stat-label">TPM</span>
-          <span class="stat-value" data-stat="tpm">0</span>
+          <span class="stat-label">WPM</span>
+          <span class="stat-value" data-stat="wpm">0</span>
         </div>
         <div class="stat">
           <span class="stat-label">Accuracy</span>
@@ -38,7 +38,7 @@ export class StatsDisplay {
     `;
 
     this.#els = {
-      tpm: this.#container.querySelector('[data-stat="tpm"]'),
+      wpm: this.#container.querySelector('[data-stat="wpm"]'),
       accuracy: this.#container.querySelector('[data-stat="accuracy"]'),
       errors: this.#container.querySelector('[data-stat="errors"]'),
       remaining: this.#container.querySelector('[data-stat="remaining"]'),
@@ -46,8 +46,8 @@ export class StatsDisplay {
     };
   }
 
-  #update({ tpm, accuracy, errors, remaining }) {
-    this.#els.tpm.textContent = tpm;
+  #update({ wpm, accuracy, errors, remaining }) {
+    this.#els.wpm.textContent = wpm;
     this.#els.accuracy.textContent = `${accuracy}%`;
     this.#els.errors.textContent = errors;
 
@@ -56,12 +56,12 @@ export class StatsDisplay {
     }
   }
 
-  #showResult({ tpm, accuracy, errors, duration }) {
+  #showResult({ wpm, accuracy, errors, duration }) {
     this.#els.result.hidden = false;
     this.#els.result.innerHTML = `
       <div class="result-title">Complete!</div>
       <div class="result-stats">
-        <span><strong>${tpm}</strong> TPM</span>
+        <span><strong>${wpm}</strong> WPM</span>
         <span><strong>${accuracy}%</strong> Accuracy</span>
         <span><strong>${errors}</strong> Errors</span>
         <span><strong>${duration}s</strong> Duration</span>
@@ -70,7 +70,7 @@ export class StatsDisplay {
   }
 
   #reset() {
-    this.#els.tpm.textContent = '0';
+    this.#els.wpm.textContent = '0';
     this.#els.accuracy.textContent = '100%';
     this.#els.errors.textContent = '0';
     this.#els.remaining.textContent = '-';
