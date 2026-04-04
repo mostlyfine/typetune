@@ -40,6 +40,37 @@ export const REPOS = {
     { owner: 'dotnet', repo: 'aspnetcore', branch: 'main', files: ['src/Http/Routing/src/RouteEndpointBuilder.cs', 'src/Mvc/Mvc.Core/src/ControllerBase.cs'] },
     { owner: 'dotnet', repo: 'efcore', branch: 'main', files: ['src/EFCore/DbContext.cs', 'src/EFCore/Query/Internal/QueryCompiler.cs'] },
   ],
+  java: [
+    { owner: 'google', repo: 'guava', branch: 'master', files: ['guava/src/com/google/common/collect/ImmutableList.java', 'guava/src/com/google/common/base/Preconditions.java'] },
+    { owner: 'spring-projects', repo: 'spring-framework', branch: 'main', files: ['spring-core/src/main/java/org/springframework/util/StringUtils.java', 'spring-beans/src/main/java/org/springframework/beans/BeanUtils.java'] },
+    { owner: 'apache', repo: 'commons-lang', branch: 'master', files: ['src/main/java/org/apache/commons/lang3/StringUtils.java', 'src/main/java/org/apache/commons/lang3/ArrayUtils.java'] },
+  ],
+  cpp: [
+    { owner: 'google', repo: 'leveldb', branch: 'main', files: ['db/db_impl.cc', 'util/cache.cc'] },
+    { owner: 'protocolbuffers', repo: 'protobuf', branch: 'main', files: ['src/google/protobuf/message.cc', 'src/google/protobuf/descriptor.cc'] },
+    { owner: 'catchorg', repo: 'Catch2', branch: 'devel', files: ['src/catch2/catch_session.cpp', 'src/catch2/reporters/catch_reporter_console.cpp'] },
+  ],
+  swift: [
+    { owner: 'Alamofire', repo: 'Alamofire', branch: 'master', files: ['Source/Alamofire.swift', 'Source/Session.swift', 'Source/Request.swift'] },
+    { owner: 'vapor', repo: 'vapor', branch: 'main', files: ['Sources/Vapor/Application.swift', 'Sources/Vapor/Routing/Router.swift'] },
+    { owner: 'apple', repo: 'swift-nio', branch: 'main', files: ['Sources/NIOCore/Channel.swift', 'Sources/NIOCore/EventLoop.swift'] },
+  ],
 };
 
-export const LANGUAGES = Object.keys(REPOS);
+export const LANGUAGE_LABELS = {
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  python: 'Python',
+  go: 'Go',
+  rust: 'Rust',
+  ruby: 'Ruby',
+  php: 'PHP',
+  csharp: 'C#',
+  java: 'Java',
+  cpp: 'C++',
+  swift: 'Swift',
+};
+
+export const LANGUAGES = Object.keys(REPOS).sort((a, b) =>
+  (LANGUAGE_LABELS[b] || b).localeCompare(LANGUAGE_LABELS[a] || a)
+);

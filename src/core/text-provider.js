@@ -2,7 +2,7 @@ import { REPOS } from '../data/repo-list.js';
 
 const FUNC_PATTERNS = [
   /^(export\s+)?(default\s+)?(async\s+)?function\s/,
-  /^func[\s(]/,
+  /\bfunc\s+\w/,
   /^(pub(\s*\(\w+\))?\s+)?(async\s+)?(unsafe\s+)?fn\s/,
   /^(async\s+)?def\s/,
 ];
@@ -84,7 +84,8 @@ export class TextProvider {
       .replace(/^[ \t]*from\s+\S+\s+import\s*\([\s\S]*?\)/gm, '')
       .replace(/^[ \t]*use\s+\S+::\{[\s\S]*?\};\s*$/gm, '')
       .replace(/^[ \t]*\/\/.*$/gm, '')
-      .replace(/^[ \t]*#(?![!]|include).*$/gm, '')
+      .replace(/^[ \t]*#(?![!]).*$/gm, '')
+      .replace(/^[ \t]*package\s+[\w.]+;\s*$/gm, '')
       .replace(/^[ \t]*import\b.*$/gm, '')
       .replace(/^[ \t]*from\s+\S+\s+import\b.*$/gm, '')
       .replace(/^[ \t]*(require|require_relative|require_once|include_once)\b.*$/gm, '')
@@ -121,7 +122,7 @@ export class TextProvider {
   #isFuncStart(line) {
     const t = line.trimStart();
     if (FUNC_PATTERNS.some(p => p.test(t))) return true;
-    if (/^(public|private|protected|internal)\s+/.test(t) &&
+    if (/^(public|private|protected|internal|open|fileprivate)\s+/.test(t) &&
         /\w+\s*\(/.test(t) &&
         !/\b(class|interface|struct|enum|record|delegate|namespace)\b/.test(t)) return true;
     return false;
@@ -186,6 +187,9 @@ export class TextProvider {
       rb: 'ruby',
       php: 'php',
       cs: 'csharp',
+      java: 'java',
+      cpp: 'cpp', cc: 'cpp', cxx: 'cpp', hpp: 'cpp', h: 'cpp',
+      swift: 'swift',
     };
     return map[ext] || ext || 'unknown';
   }

@@ -1,4 +1,4 @@
-import { LANGUAGES } from '../data/repo-list.js';
+import { LANGUAGES, LANGUAGE_LABELS } from '../data/repo-list.js';
 import { PRESETS, generatePracticeText } from '../data/practice-presets.js';
 import { KeymapLoader } from '../core/keymap-loader.js';
 import './settings-panel.css';
@@ -39,7 +39,7 @@ export class SettingsPanel {
           <div class="sp-group">
             <label class="sp-label">Lang</label>
             <select id="sp-language" class="sp-select">
-              ${LANGUAGES.map(l => `<option value="${l}">${l}</option>`).join('')}
+              ${LANGUAGES.map(l => `<option value="${l}">${LANGUAGE_LABELS[l] || l}</option>`).join('')}
             </select>
             <button id="sp-fetch" class="sp-btn">Fetch</button>
           </div>
