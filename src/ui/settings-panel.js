@@ -42,7 +42,7 @@ export class SettingsPanel {
             <select id="sp-language" class="sp-select">
               ${LANGUAGES.map(l => `<option value="${l}">${LANGUAGE_LABELS[l] || l}</option>`).join('')}
             </select>
-            <button id="sp-fetch" class="sp-btn">Fetch</button>
+            <button id="sp-fetch" class="sp-btn">Load</button>
           </div>
           <div class="sp-group">
             <label class="sp-label">File</label>
@@ -53,13 +53,13 @@ export class SettingsPanel {
         <div class="sp-row">
           <div class="sp-group">
             <label class="sp-label">Mode</label>
-            <select id="sp-mode" class="sp-select">
+            <select id="sp-mode" class="sp-select sp-select-narrow">
               <option value="free">Free</option>
               <option value="time">1min Test</option>
               <option value="time-custom">Time Test</option>
               <option value="chars">Char Count</option>
             </select>
-            <input id="sp-mode-value" type="number" class="sp-input sp-input-narrow" placeholder="60" hidden>
+            <input id="sp-mode-value" type="number" class="sp-input" placeholder="60" hidden>
             <span id="sp-mode-unit" class="sp-unit" hidden></span>
           </div>
           <div class="sp-group">
@@ -133,10 +133,10 @@ export class SettingsPanel {
         this.#applyMode();
         this.#engine.start();
       } catch (e) {
-        alert(`Failed to fetch: ${e.message}`);
+        alert(`Failed to load: ${e.message}`);
       } finally {
         fetchBtn.disabled = false;
-        fetchBtn.textContent = 'Fetch';
+        fetchBtn.textContent = 'Load';
       }
     });
 

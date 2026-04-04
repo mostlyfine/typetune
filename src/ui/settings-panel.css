@@ -122,10 +122,12 @@
   min-width: 0;
 }
 
-.sp-input-narrow {
-  flex: 0;
-  width: 60px;
+.sp-select-narrow {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: fit-content;
 }
+
 
 .sp-btn {
   background: var(--accent);
