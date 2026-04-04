@@ -222,7 +222,7 @@ export class SettingsPanel {
   #loadKeymap(text, filename = '') {
     try {
       const result = this.#keymapLoader.load(text, filename);
-      this.#bus.emit('layout:changed', { layout: result.layout });
+      this.#bus.emit('layout:changed', { layout: result.layout, layerCharMap: result.layerCharMap });
     } catch (e) {
       alert(`Failed to parse keymap: ${e.message}`);
     }

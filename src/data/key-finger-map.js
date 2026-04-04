@@ -97,3 +97,23 @@ export function getFingerForChar(char) {
 
   return fingers.filter(Boolean);
 }
+
+// Fingers for layer combo: activator + target + optional shift
+export function getFingersForLayerMapping(mapping) {
+  const fingers = new Set();
+
+  if (mapping.activatorFinger) {
+    fingers.add(mapping.activatorFinger);
+  }
+
+  const targetFinger = KEY_TO_FINGER[mapping.targetCode];
+  if (targetFinger) {
+    fingers.add(targetFinger);
+
+    if (mapping.shift) {
+      fingers.add(targetFinger.startsWith('r-') ? FINGERS.L_PINKY : FINGERS.R_PINKY);
+    }
+  }
+
+  return [...fingers];
+}

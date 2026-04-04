@@ -8,6 +8,7 @@ export class Keyboard {
   #container;
   #layout;
   #keyEls = new Map();  // code -> DOM element
+  #layerCharMap = {};   // char -> { activator, targetCode, shift? }
 
   constructor(bus, container) {
     this.#bus = bus;
@@ -15,11 +16,12 @@ export class Keyboard {
     this.#layout = QWERTY_LAYOUT;
     this.#render();
     this.#bus.on('highlight:key', (data) => this.#highlight(data));
-    this.#bus.on('layout:changed', ({ layout }) => this.#setLayout(layout));
+    this.#bus.on('layout:changed', ({ layout, layerCharMap }) => this.#setLayout(layout, layerCharMap));
   }
 
-  #setLayout(layout) {
+  #setLayout(layout, layerCharMap) {
     this.#layout = layout || QWERTY_LAYOUT;
+    this.#layerCharMap = layerCharMap || {};
     this.#render();
   }
 
@@ -75,14 +77,29 @@ export class Keyboard {
     if (!mapping) return;
 
     const keyEl = this.#keyEls.get(mapping.code);
-    if (keyEl) keyEl.classList.add('kb-highlight');
+    if (keyEl) {
+      keyEl.classList.add('kb-highlight');
+      if (mapping.shift) {
+        if (isRightHandKey(mapping.code)) {
+          this.#keyEls.get('LSHIFT')?.classList.add('kb-highlight');
+        } else {
+          this.#keyEls.get('RSHIFT')?.classList.add('kb-highlight');
+        }
+      }
+      return;
+    }
 
-    if (mapping.shift) {
-      // Highlight the opposite-side shift key
-      if (isRightHandKey(mapping.code)) {
-        this.#keyEls.get('LSHIFT')?.classList.add('kb-highlight');
-      } else {
-        this.#keyEls.get('RSHIFT')?.classList.add('kb-highlight');
+    // Character requires layer switch — highlight activator + target position
+    const layerMapping = this.#layerCharMap[char];
+    if (layerMapping) {
+      this.#keyEls.get(layerMapping.activator)?.classList.add('kb-highlight');
+      this.#keyEls.get(layerMapping.targetCode)?.classList.add('kb-highlight');
+      if (layerMapping.shift) {
+        if (isRightHandKey(layerMapping.targetCode)) {
+          this.#keyEls.get('LSHIFT')?.classList.add('kb-highlight');
+        } else {
+          this.#keyEls.get('RSHIFT')?.classList.add('kb-highlight');
+        }
       }
     }
   }

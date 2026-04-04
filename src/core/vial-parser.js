@@ -1,6 +1,52 @@
 import { decodeVialKeycode, resolveQmkKeycode, splitIntoRows } from '../data/qmk-keycodes.js';
 import { buildSplitLayout } from './parser-utils.js';
 import { ViaParser } from './via-parser.js';
+import { ZMK_KEY_MAP } from '../data/key-labels.js';
+
+// Detect encoder columns (columns that are mostly -1 with at most one real key)
+function detectEncoderCols(rows) {
+  if (rows.length === 0) return new Set();
+  const cols = rows[0].length;
+  const encoderCols = new Set();
+  for (let c = 0; c < cols; c++) {
+    const blanks = rows.filter(r => r[c] === -1).length;
+    if (blanks > 0 && blanks >= rows.length - 1) {
+      encoderCols.add(c);
+    }
+  }
+  return encoderCols;
+}
+
+function stripCols(rows, colsToStrip) {
+  if (colsToStrip.size === 0) return rows;
+  return rows.map(r => r.filter((_, c) => !colsToStrip.has(c)));
+}
+
+// Estimate finger from physical position in a split keyboard half
+function fingerForPosition(side, row, col, totalRows, totalCols) {
+  const prefix = side === 'left' ? 'l-' : 'r-';
+  const isThumbRow = row === totalRows - 1;
+
+  if (isThumbRow) {
+    if (col >= totalCols - 2) return `${prefix}thumb`;
+    if (col >= totalCols - 3) return `${prefix}index`;
+    if (col === 0) return `${prefix}pinky`;
+    if (col === 1) return `${prefix}ring`;
+    return `${prefix}middle`;
+  }
+
+  if (totalCols >= 6) {
+    if (col <= 1) return `${prefix}pinky`;
+    if (col === 2) return `${prefix}ring`;
+    if (col === 3) return `${prefix}middle`;
+    return `${prefix}index`;
+  }
+
+  if (col === 0) return `${prefix}pinky`;
+  if (col === 1) return `${prefix}ring`;
+  if (col === 2) return `${prefix}middle`;
+  return `${prefix}index`;
+}
 
 export class VialParser {
   #via = new ViaParser();
@@ -62,24 +108,112 @@ export class VialParser {
     const leftRows = baseLayer.slice(0, half);
     const rightRows = baseLayer.slice(half);
 
+    const leftEncCols = detectEncoderCols(leftRows);
+    const rightEncCols = detectEncoderCols(rightRows);
+
+    const cleanLeft = stripCols(leftRows, leftEncCols);
+    const cleanRight = stripCols(rightRows, rightEncCols);
+
     const GAP_KEY = { code: '_GAP', w: 0.5, isGap: true };
     const BLANK_KEY = { code: '_GAP', w: 1, isGap: true };
     const resolveKey = kc => kc === -1 ? BLANK_KEY : resolveQmkKeycode(kc);
 
     const layoutRows = [];
     for (let i = 0; i < half; i++) {
-      const left = leftRows[i].map(resolveKey);
-      const right = [...rightRows[i]].reverse().map(resolveKey);
+      const left = cleanLeft[i].map(resolveKey);
+      const right = [...cleanRight[i]].reverse().map(resolveKey);
       if (left.some(k => !k.isGap) || right.some(k => !k.isGap)) {
         layoutRows.push([...left, GAP_KEY, ...right]);
       }
     }
 
+    const layerCharMap = this.#buildLayerCharMap(layerData, half, leftEncCols, rightEncCols);
+
     return {
       name: 'Vial Custom',
       layers,
       layout: { name: 'Vial Custom', rows: layoutRows },
+      layerCharMap,
     };
+  }
+
+  #buildLayerCharMap(layerData, half, leftEncCols, rightEncCols) {
+    const charMap = {};
+    const resolve = kc => kc === -1 ? null : resolveQmkKeycode(kc);
+
+    // Scan base layer for activators and existing chars
+    const base = layerData[0];
+    const baseLeft = stripCols(base.slice(0, half), leftEncCols);
+    const baseRight = stripCols(base.slice(half), rightEncCols);
+    const totalCols = baseLeft[0]?.length || 0;
+
+    const activators = new Map(); // layerNum -> { code, finger }
+    const baseChars = new Set();
+
+    const scanSide = (rows, side) => {
+      for (let i = 0; i < rows.length; i++) {
+        for (let c = 0; c < rows[i].length; c++) {
+          const key = resolve(rows[i][c]);
+          if (!key) continue;
+          if (key.isLayer) {
+            const m = key.code.match(/^(?:MO|TG|TT|TO|OSL)\((\d+)\)$/);
+            if (m) {
+              const finger = fingerForPosition(side, i, c, half, totalCols);
+              activators.set(parseInt(m[1]), { code: key.code, finger });
+            }
+          }
+          if (key.layerTap !== undefined && !activators.has(key.layerTap)) {
+            const finger = fingerForPosition(side, i, c, half, totalCols);
+            activators.set(key.layerTap, { code: key.code, finger });
+          }
+          const info = ZMK_KEY_MAP[key.code];
+          if (info?.char) baseChars.add(info.char);
+          if (info?.shiftChar) baseChars.add(info.shiftChar);
+        }
+      }
+    };
+    scanSide(baseLeft, 'left');
+    scanSide(baseRight, 'right');
+
+    // Map chars from non-base layers to base layer positions
+    for (let li = 1; li < layerData.length; li++) {
+      const act = activators.get(li);
+      if (!act) continue;
+
+      const layer = layerData[li];
+      const layerLeft = stripCols(layer.slice(0, half), leftEncCols);
+      const layerRight = stripCols(layer.slice(half), rightEncCols);
+
+      for (let i = 0; i < half; i++) {
+        for (let c = 0; c < layerLeft[i].length; c++) {
+          const lk = resolve(layerLeft[i][c]);
+          const bk = resolve(baseLeft[i][c]);
+          if (lk && bk && !lk.isTrans && !lk.isNone && !lk.isLayer) {
+            this.#addCharEntry(charMap, lk.code, bk.code, act, baseChars);
+          }
+        }
+        for (let c = 0; c < layerRight[i].length; c++) {
+          const lk = resolve(layerRight[i][c]);
+          const bk = resolve(baseRight[i][c]);
+          if (lk && bk && !lk.isTrans && !lk.isNone && !lk.isLayer) {
+            this.#addCharEntry(charMap, lk.code, bk.code, act, baseChars);
+          }
+        }
+      }
+    }
+
+    return charMap;
+  }
+
+  #addCharEntry(charMap, layerCode, baseCode, act, baseChars) {
+    const info = ZMK_KEY_MAP[layerCode];
+    if (!info) return;
+    if (info.char && !baseChars.has(info.char) && !charMap[info.char]) {
+      charMap[info.char] = { activator: act.code, targetCode: baseCode, activatorFinger: act.finger };
+    }
+    if (info.shiftChar && !baseChars.has(info.shiftChar) && !charMap[info.shiftChar]) {
+      charMap[info.shiftChar] = { activator: act.code, targetCode: baseCode, shift: true, activatorFinger: act.finger };
+    }
   }
 
   #detectRows(keys, data) {

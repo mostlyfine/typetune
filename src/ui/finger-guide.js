@@ -1,4 +1,4 @@
-import { getFingerForChar } from '../data/key-finger-map.js';
+import { getFingerForChar, getFingersForLayerMapping } from '../data/key-finger-map.js';
 import './finger-guide.css';
 
 const FINGER_IDS = [
@@ -10,12 +10,16 @@ export class FingerGuide {
   #bus;
   #container;
   #fingerEls = new Map();
+  #layerCharMap = {};
 
   constructor(bus, container) {
     this.#bus = bus;
     this.#container = container;
     this.#render();
     this.#bus.on('highlight:key', ({ char }) => this.#highlight(char));
+    this.#bus.on('layout:changed', ({ layerCharMap }) => {
+      this.#layerCharMap = layerCharMap || {};
+    });
   }
 
   #render() {
@@ -94,6 +98,15 @@ export class FingerGuide {
 
   #highlight(char) {
     this.#clearHighlight();
+
+    const layerMapping = this.#layerCharMap[char];
+    if (layerMapping) {
+      for (const f of getFingersForLayerMapping(layerMapping)) {
+        this.#fingerEls.get(f)?.classList.add('fg-active');
+      }
+      return;
+    }
+
     const fingers = getFingerForChar(char);
     if (!fingers) return;
     for (const f of fingers) {
