@@ -9,6 +9,7 @@ export class Keyboard {
   #layout;
   #keyEls = new Map();  // code -> DOM element
   #layerCharMap = {};   // char -> { activator, targetCode, shift? }
+  #errorCounts = new Map();  // code -> error count
 
   constructor(bus, container) {
     this.#bus = bus;
@@ -17,11 +18,15 @@ export class Keyboard {
     this.#render();
     this.#bus.on('highlight:key', (data) => this.#highlight(data));
     this.#bus.on('layout:changed', ({ layout, layerCharMap }) => this.#setLayout(layout, layerCharMap));
+    this.#bus.on('typing:error', ({ expected }) => this.#trackError(expected));
+    this.#bus.on('typing:complete', () => this.#showErrorHeatmap());
+    this.#bus.on('text:loaded', () => this.#clearErrorHeatmap());
   }
 
   #setLayout(layout, layerCharMap) {
     this.#layout = layout || QWERTY_LAYOUT;
     this.#layerCharMap = layerCharMap || {};
+    this.#errorCounts.clear();
     this.#render();
   }
 
@@ -107,6 +112,41 @@ export class Keyboard {
   #clearHighlight() {
     for (const el of this.#keyEls.values()) {
       el.classList.remove('kb-highlight');
+    }
+  }
+
+  #trackError(expected) {
+    const mapping = CHAR_TO_KEY[expected];
+    if (mapping) {
+      this.#errorCounts.set(mapping.code, (this.#errorCounts.get(mapping.code) || 0) + 1);
+      return;
+    }
+    const layerMapping = this.#layerCharMap[expected];
+    if (layerMapping) {
+      this.#errorCounts.set(layerMapping.targetCode, (this.#errorCounts.get(layerMapping.targetCode) || 0) + 1);
+    }
+  }
+
+  #showErrorHeatmap() {
+    this.#clearHighlight();
+    if (this.#errorCounts.size === 0) return;
+
+    const max = Math.max(...this.#errorCounts.values());
+    for (const [code, count] of this.#errorCounts) {
+      const el = this.#keyEls.get(code);
+      if (!el) continue;
+      const level = max === 1 ? 'high'
+        : count > max * 2 / 3 ? 'high'
+        : count > max / 3 ? 'mid'
+        : 'low';
+      el.classList.add(`kb-error-${level}`);
+    }
+  }
+
+  #clearErrorHeatmap() {
+    this.#errorCounts.clear();
+    for (const el of this.#keyEls.values()) {
+      el.classList.remove('kb-error-low', 'kb-error-mid', 'kb-error-high');
     }
   }
 }
