@@ -154,7 +154,7 @@ export class SettingsPanel {
       if (!presetId) return;
       const preset = PRESETS[presetId];
       const keys = preset.keys();
-      const text = generatePracticeText(keys, 300);
+      const text = generatePracticeText(keys, 300, preset.words);
       this.#textProvider.loadText(text, preset.name);
       this.#applyMode();
       this.#engine.start();

@@ -66,7 +66,11 @@ export class StatsDisplay {
         <span><strong>${errors}</strong> Errors</span>
         <span><strong>${duration}s</strong> Duration</span>
       </div>
+      <button class="result-retry">Retry</button>
     `;
+    this.#els.result.querySelector('.result-retry').addEventListener('click', () => {
+      this.#bus.emit('typing:retry');
+    });
   }
 
   #reset() {

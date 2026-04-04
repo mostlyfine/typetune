@@ -58,3 +58,20 @@
 .result-stats strong {
   color: var(--text-bright);
 }
+
+.result-retry {
+  margin-top: 12px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--green);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.result-retry:hover {
+  opacity: 0.85;
+}

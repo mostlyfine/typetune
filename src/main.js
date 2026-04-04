@@ -30,5 +30,10 @@ const sampleText = `function fibonacci(n) {
   return b;
 }`;
 
+bus.on('typing:retry', () => {
+  bus.emit('text:loaded', { text: engine.text, source: 'retry' });
+  engine.start();
+});
+
 bus.emit('text:loaded', { text: sampleText, language: 'javascript', source: 'sample' });
 engine.start();
