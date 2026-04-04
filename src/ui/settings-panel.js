@@ -160,6 +160,18 @@ export class SettingsPanel {
       this.#engine.start();
     });
 
+    // Preset selection — generate text immediately
+    presetSelect.addEventListener('change', () => {
+      const presetId = presetSelect.value;
+      if (!presetId) return;
+      const preset = PRESETS[presetId];
+      const keys = preset.keys();
+      const text = generatePracticeText(keys, 300);
+      this.#textProvider.loadText(text, preset.name);
+      this.#applyMode();
+      this.#engine.start();
+    });
+
     // Mode selection
     modeSelect.addEventListener('change', () => {
       const mode = modeSelect.value;
