@@ -5,9 +5,9 @@
 }
 
 .stats-bar {
-  display: flex;
-  gap: 24px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
 }
 
 .stat {
@@ -26,7 +26,7 @@
 
 .stat-value {
   font-family: var(--font-mono);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-bright);
 }
@@ -47,11 +47,12 @@
 }
 
 .result-stats {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  font-size: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  font-size: 13px;
   color: var(--text);
+  text-align: center;
 }
 
 .result-stats strong {

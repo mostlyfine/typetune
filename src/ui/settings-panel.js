@@ -25,18 +25,20 @@ export class SettingsPanel {
   #build() {
     this.#container.innerHTML = `
       <div class="sp-header">
-        <button id="sp-toggle" class="sp-toggle-btn">Settings &#x25BE;</button>
-        <div class="sp-header-actions">
-          <button id="sp-start" class="sp-start-btn">Start</button>
-          <button id="sp-sound" class="sp-sound-btn">Sound: ON</button>
-          <button id="sp-theme" class="sp-theme-btn">Light</button>
+        <button id="sp-start" class="sp-start-btn">Start</button>
+        <div class="sp-header-bottom">
+          <button id="sp-toggle" class="sp-toggle-btn">Settings &#x25BE;</button>
+          <div class="sp-header-actions">
+            <button id="sp-sound" class="sp-sound-btn">Sound: ON</button>
+            <button id="sp-theme" class="sp-theme-btn">Light</button>
+          </div>
         </div>
       </div>
       <div class="sp-bar">
-        <!-- Text source row -->
+        <hr class="sp-divider">
         <div class="sp-row">
           <div class="sp-group">
-            <label class="sp-label">Language</label>
+            <label class="sp-label">Lang</label>
             <select id="sp-language" class="sp-select">
               ${LANGUAGES.map(l => `<option value="${l}">${l}</option>`).join('')}
             </select>
@@ -47,8 +49,7 @@ export class SettingsPanel {
             <input id="sp-file" type="file" class="sp-file-input">
           </div>
         </div>
-
-        <!-- Practice mode row -->
+        <hr class="sp-divider">
         <div class="sp-row">
           <div class="sp-group">
             <label class="sp-label">Mode</label>
@@ -56,7 +57,7 @@ export class SettingsPanel {
               <option value="free">Free</option>
               <option value="time">1min Test</option>
               <option value="time-custom">Time Test</option>
-              <option value="chars">Char Count Test</option>
+              <option value="chars">Char Count</option>
             </select>
             <input id="sp-mode-value" type="number" class="sp-input sp-input-narrow" placeholder="60" hidden>
             <span id="sp-mode-unit" class="sp-unit" hidden></span>
@@ -64,13 +65,12 @@ export class SettingsPanel {
           <div class="sp-group">
             <label class="sp-label">Practice</label>
             <select id="sp-preset" class="sp-select">
-              <option value="">-- Code Input --</option>
+              <option value="">-- Code --</option>
               ${Object.entries(PRESETS).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}
             </select>
           </div>
         </div>
-
-        <!-- Keymap row -->
+        <hr class="sp-divider">
         <div class="sp-row">
           <div class="sp-group">
             <label class="sp-label">Keymap</label>
