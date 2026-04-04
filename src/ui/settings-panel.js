@@ -25,7 +25,6 @@ export class SettingsPanel {
   #build() {
     this.#container.innerHTML = `
       <div class="sp-header">
-        <button id="sp-start" class="sp-start-btn">Start</button>
         <div class="sp-header-bottom">
           <button id="sp-toggle" class="sp-toggle-btn">Settings &#x25BE;</button>
           <div class="sp-header-actions">
@@ -100,27 +99,8 @@ export class SettingsPanel {
     // Header buttons
     this.#container.querySelector('#sp-toggle').addEventListener('click', () => this.#toggleCollapse());
 
-    const startBtn = this.#container.querySelector('#sp-start');
     const soundBtn = this.#container.querySelector('#sp-sound');
     const presetSelect = this.#container.querySelector('#sp-preset');
-
-    startBtn.addEventListener('click', () => {
-      const presetId = presetSelect.value;
-      if (presetId) {
-        const preset = PRESETS[presetId];
-        const keys = preset.keys();
-        const text = generatePracticeText(keys, 300);
-        this.#textProvider.loadText(text, preset.name);
-      } else {
-        this.#bus.emit('text:loaded', {
-          text: this.#engine.text,
-          language: 'restart',
-          source: 'restart',
-        });
-      }
-      this.#applyMode();
-      this.#engine.start();
-    });
 
     soundBtn.addEventListener('click', () => {
       this.#sound.toggle();

@@ -37,23 +37,6 @@
   align-items: center;
 }
 
-.sp-start-btn {
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  border-radius: 6px;
-  padding: 8px 0;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  width: 100%;
-}
-
-.sp-start-btn:hover {
-  opacity: 0.9;
-}
-
 .sp-sound-btn,
 .sp-theme-btn {
   background: var(--bg-overlay);
