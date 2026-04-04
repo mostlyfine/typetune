@@ -1,8 +1,10 @@
 #text-display {
   background: var(--bg-surface);
+  border: 1px solid var(--bg-overlay);
   border-radius: 8px;
-  padding: 16px;
+  padding: 10px;
   min-height: 160px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .td-placeholder {
@@ -14,8 +16,8 @@
 
 .td-code {
   font-family: var(--font-mono);
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.65;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -28,7 +30,7 @@
 
 .td-line-active {
   border-left-color: var(--accent);
-  background: rgba(137, 180, 250, 0.08);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .td-correct {

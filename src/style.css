@@ -3,7 +3,7 @@
   --bg-surface: #2a2a42;
   --bg-overlay: #383858;
   --text: #d0d8f8;
-  --text-dim: #7a7e98;
+  --text-dim: #9a9eb8;
   --text-bright: #ffffff;
   --accent: #89b4fa;
   --accent-dim: #4e5068;
@@ -21,10 +21,10 @@
 
 [data-theme="light"] {
   --bg: #eff1f5;
-  --bg-surface: #e0e3ec;
+  --bg-surface: #ffffff;
   --bg-overlay: #d3d7e2;
   --text: #44475e;
-  --text-dim: #8388a0;
+  --text-dim: #6b7090;
   --text-bright: #1a1a2e;
   --accent: #1e66f5;
   --accent-dim: #b0b4c4;
@@ -61,6 +61,19 @@ body {
   padding: 24px 16px;
   display: flex;
   gap: 16px;
+}
+
+.site-logo {
+  font-family: 'Outfit', var(--font-sans);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-align: center;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 85%, transparent), color-mix(in srgb, var(--green) 85%, transparent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 #main {
