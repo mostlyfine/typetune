@@ -28,7 +28,7 @@
 
 .td-line-active {
   border-left-color: var(--accent);
-  background: rgba(137, 180, 250, 0.05);
+  background: rgba(137, 180, 250, 0.08);
 }
 
 .td-correct {
@@ -50,7 +50,7 @@
 
 @keyframes cursor-blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  50% { opacity: 0.5; }
 }
 
 .td-pending {
