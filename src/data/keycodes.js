@@ -1,5 +1,5 @@
-// QMK keycode (KC_ prefix stripped) -> internal canonical code (matching ZMK_KEY_MAP keys)
-export const QMK_TO_INTERNAL = {
+// Keycode (KC_ prefix stripped) -> internal canonical code (matching ZMK_KEY_MAP keys)
+const KEYCODE_TO_INTERNAL = {
   // Letters
   A: 'A', B: 'B', C: 'C', D: 'D', E: 'E', F: 'F', G: 'G', H: 'H',
   I: 'I', J: 'J', K: 'K', L: 'L', M: 'M', N: 'N', O: 'O', P: 'P',
@@ -70,7 +70,7 @@ export const QMK_TO_INTERNAL = {
   NO: '_NONE',
 };
 
-// QMK MOD_* -> internal modifier code
+// MOD_* -> internal modifier code
 const MOD_MAP = {
   MOD_LSFT: 'LSHIFT', MOD_RSFT: 'RSHIFT',
   MOD_LCTL: 'LCTRL', MOD_RCTL: 'RCTRL',
@@ -111,7 +111,7 @@ const HID_TO_INTERNAL = {
 };
 
 function resolveSimple(name) {
-  return QMK_TO_INTERNAL[name] || name;
+  return KEYCODE_TO_INTERNAL[name] || name;
 }
 
 // Resolve modifier expression like "MOD_LSFT | MOD_RSFT" to first known mod
@@ -124,8 +124,8 @@ function resolveModExpr(expr) {
   return parts[0].trim();
 }
 
-// Resolve a QMK keycode string to an internal key object
-export function resolveQmkKeycode(raw) {
+// Resolve a keycode string to an internal key object
+export function resolveKeycode(raw) {
   if (!raw) return { code: '_NONE', w: 1, isNone: true };
   raw = raw.trim();
 
@@ -153,7 +153,7 @@ export function resolveQmkKeycode(raw) {
   // LT(layer, keycode)
   const ltMatch = raw.match(/^LT\((\d+)\s*,\s*(.+)\)$/);
   if (ltMatch) {
-    const inner = resolveQmkKeycode(ltMatch[2]);
+    const inner = resolveKeycode(ltMatch[2]);
     return { code: inner.code, w: 1, layerTap: parseInt(ltMatch[1]) };
   }
 
@@ -162,15 +162,15 @@ export function resolveQmkKeycode(raw) {
   if (mtMatch) {
     const modStr = mtMatch[1].trim();
     const mod = resolveModExpr(modStr);
-    const inner = resolveQmkKeycode(mtMatch[2]);
+    const inner = resolveKeycode(mtMatch[2]);
     return { code: inner.code, w: 1, modTap: mod };
   }
 
   // Shorthand mod-taps: LSFT_T(kc), LCTL_T(kc), etc.
   const modTapShort = raw.match(/^(LSFT|RSFT|LCTL|RCTL|LALT|RALT|LGUI|RGUI)_T\((.+)\)$/);
   if (modTapShort) {
-    const mod = QMK_TO_INTERNAL[modTapShort[1]] || modTapShort[1];
-    const inner = resolveQmkKeycode(modTapShort[2]);
+    const mod = KEYCODE_TO_INTERNAL[modTapShort[1]] || modTapShort[1];
+    const inner = resolveKeycode(modTapShort[2]);
     return { code: inner.code, w: 1, modTap: mod };
   }
 
@@ -213,7 +213,7 @@ export function resolveQmkKeycode(raw) {
 
 // Decode Vial numeric keycode to internal key object
 export function decodeVialKeycode(num) {
-  if (typeof num === 'string') return resolveQmkKeycode(num);
+  if (typeof num === 'string') return resolveKeycode(num);
 
   num = num & 0xFFFF;
 

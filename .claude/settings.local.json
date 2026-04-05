@@ -9,7 +9,9 @@
       "WebFetch(domain:get.vial.today)",
       "WebFetch(domain:www.caniusevia.com)",
       "WebFetch(domain:docs.qmk.fm)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.reddit.com)",
+      "WebFetch(domain:old.reddit.com)"
     ]
   }
 }

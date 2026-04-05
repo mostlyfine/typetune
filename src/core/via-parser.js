@@ -1,4 +1,4 @@
-import { resolveQmkKeycode } from '../data/qmk-keycodes.js';
+import { resolveKeycode } from '../data/keycodes.js';
 import { buildSplitLayout } from './parser-utils.js';
 
 // Keys that typically start a keyboard row
@@ -97,7 +97,7 @@ export class ViaParser {
     const rows = [];
     for (let i = 0; i < keycodes.length; i += cols) {
       const rawRow = keycodes.slice(i, i + cols);
-      const keys = rawRow.map(kc => resolveQmkKeycode(kc)).filter(k => !k.isNone);
+      const keys = rawRow.map(kc => resolveKeycode(kc)).filter(k => !k.isNone);
       if (keys.length > 0) rows.push(keys);
     }
     return rows;

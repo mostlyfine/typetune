@@ -1,4 +1,4 @@
-import { decodeVialKeycode, resolveQmkKeycode, splitIntoRows } from '../data/qmk-keycodes.js';
+import { decodeVialKeycode, resolveKeycode, splitIntoRows } from '../data/keycodes.js';
 import { GAP_KEY, buildSplitLayout } from './parser-utils.js';
 import { ViaParser } from './via-parser.js';
 import { ZMK_KEY_MAP } from '../data/key-labels.js';
@@ -76,7 +76,7 @@ export class VialParser {
 
     const baseLayer = layers[0].keycodes;
     const keys = baseLayer.map(kc =>
-      typeof kc === 'number' ? decodeVialKeycode(kc) : resolveQmkKeycode(kc)
+      typeof kc === 'number' ? decodeVialKeycode(kc) : resolveKeycode(kc)
     );
 
     const rows = this.#detectRows(keys, data);
@@ -115,7 +115,7 @@ export class VialParser {
     const cleanRight = stripCols(rightRows, rightEncCols);
 
     const BLANK_KEY = { code: '_GAP', w: 1, isGap: true };
-    const resolveKey = kc => kc === -1 ? BLANK_KEY : resolveQmkKeycode(kc);
+    const resolveKey = kc => kc === -1 ? BLANK_KEY : resolveKeycode(kc);
 
     const layoutRows = [];
     for (let i = 0; i < half; i++) {
@@ -138,7 +138,7 @@ export class VialParser {
 
   #buildLayerCharMap(layerData, half, leftEncCols, rightEncCols) {
     const charMap = {};
-    const resolve = kc => kc === -1 ? null : resolveQmkKeycode(kc);
+    const resolve = kc => kc === -1 ? null : resolveKeycode(kc);
 
     // Scan base layer for activators and existing chars
     const base = layerData[0];

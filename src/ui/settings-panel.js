@@ -74,7 +74,7 @@ export class SettingsPanel {
         <div class="sp-row">
           <div class="sp-group">
             <label class="sp-label">Keymap</label>
-            <input id="sp-keymap-file" type="file" class="sp-file-input" accept=".keymap,.dtsi,.json,.c,.h,.vil">
+            <input id="sp-keymap-file" type="file" class="sp-file-input" accept=".keymap,.dtsi,.json,.vil">
             <button id="sp-keymap-reset" class="sp-btn">Reset</button>
           </div>
         </div>

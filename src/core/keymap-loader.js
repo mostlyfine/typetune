@@ -1,13 +1,11 @@
 import { ZmkParser } from './zmk-parser.js';
 import { ViaParser } from './via-parser.js';
 import { VialParser } from './vial-parser.js';
-import { QmkParser } from './qmk-parser.js';
 
 export class KeymapLoader {
   #zmk = new ZmkParser();
   #via = new ViaParser();
   #vial = new VialParser();
-  #qmk = new QmkParser();
 
   load(text, filename = '') {
     const { format, parsed } = this.#detectFormat(text, filename);
@@ -16,7 +14,6 @@ export class KeymapLoader {
       case 'zmk':  return this.#zmk.parse(text);
       case 'via':  return this.#via.parse(parsed);
       case 'vial': return this.#vial.parse(parsed);
-      case 'qmk':  return this.#qmk.parse(text);
       default:
         throw new Error(`Unknown keymap format: ${filename}`);
     }
@@ -26,7 +23,6 @@ export class KeymapLoader {
     const ext = this.#getExtension(filename);
 
     if (ext === '.keymap' || ext === '.dtsi') return { format: 'zmk', parsed: null };
-    if (ext === '.c' || ext === '.h') return { format: 'qmk', parsed: null };
 
     if (ext === '.vil') {
       try {
@@ -70,7 +66,6 @@ export class KeymapLoader {
     }
 
     if (/keymap\s*\{/.test(text)) return { format: 'zmk', parsed: null };
-    if (/PROGMEM\s+keymaps/.test(text) || /LAYOUT\w*\s*\(/.test(text)) return { format: 'qmk', parsed: null };
 
     throw new Error('Could not detect keymap format');
   }
