@@ -138,6 +138,21 @@ export class ViaParser {
         if (typeof entry === 'object' && entry !== null) {
           Object.assign(props, entry);
         } else if (typeof entry === 'string') {
+          // Parse layout variant info from multiline KLE labels
+          // Format: "row,col\n\n\noptionIdx,variantIdx"
+          const lines = entry.split('\n');
+          const label = lines[0];
+          const variantInfo = lines[3];
+
+          // Skip non-default layout variants (variantIdx > 0)
+          if (variantInfo) {
+            const comma = variantInfo.indexOf(',');
+            if (comma >= 0 && parseInt(variantInfo.substring(comma + 1)) > 0) {
+              props = {};
+              continue;
+            }
+          }
+
           // Insert gap for horizontal offset
           if (props.x && props.x >= 0.25) {
             row.push({ code: '_GAP', w: props.x, isGap: true });
@@ -145,7 +160,7 @@ export class ViaParser {
 
           // Detect encoder rotation keys (h <= 0.5 in KLE = knob rotation)
           if (props.h && props.h <= 0.5) {
-            encoderBuffer.push(entry);
+            encoderBuffer.push(label);
             if (encoderBuffer.length === 2) {
               row.push({
                 code: `_ENC${encoderCount++}`,
@@ -167,14 +182,14 @@ export class ViaParser {
           if (w >= 3) {
             code = 'SPACE';
           } else {
-            const posMatch = entry.match(/^(\d+),(\d+)$/);
+            const posMatch = label.match(/^(\d+),(\d+)$/);
             if (posMatch) {
               const mRow = parseInt(posMatch[1]);
               const mCol = parseInt(posMatch[2]);
               const rowMap = STANDARD_MATRIX[mRow];
               code = rowMap ? (rowMap[mCol] || `R${mRow}C${mCol}`) : `R${mRow}C${mCol}`;
             } else {
-              code = entry;
+              code = label;
             }
           }
 
