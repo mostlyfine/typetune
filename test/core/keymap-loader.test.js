@@ -189,6 +189,7 @@ describe('KeymapLoader', () => {
     const result = loader.load(text, 'ErgoDash.json');
     expect(result.name).toBe('ErgoDash');
     expect(result.layers).toEqual([]);
+    expect(result.layout.rows).toHaveLength(5);
   });
 
   test('loads lily58-mike.json via .json extension (saved keymap → VIA)', () => {

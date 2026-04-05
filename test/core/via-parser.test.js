@@ -284,28 +284,49 @@ describe('ViaParser', () => {
       expect(result.layers).toEqual([]);
     });
 
-    test('produces rows from columnar stagger KLE', () => {
-      // ErgoDash KLE uses many rows with 1-4 keys and y offsets for column stagger
-      expect(result.layout.rows.length).toBeGreaterThanOrEqual(5);
+    test('merges columnar stagger KLE rows into 5 keyboard rows', () => {
+      // ErgoDash KLE uses negative y offsets for column stagger;
+      // multiple KLE rows at similar y positions must merge into one keyboard row
+      expect(result.layout.rows).toHaveLength(5);
     });
 
-    test('has gaps from large x offsets (split ergonomic)', () => {
-      const allKeys = result.layout.rows.flat();
-      const gaps = allKeys.filter(k => k.isGap);
-      expect(gaps.length).toBeGreaterThanOrEqual(1);
+    test('each row has left-side and right-side keys with gap between', () => {
+      for (const row of result.layout.rows) {
+        const hasGap = row.some(k => k.isGap);
+        expect(hasGap).toBe(true);
+      }
     });
 
-    test('uses STANDARD_MATRIX for matrix positions', () => {
-      const allKeys = result.layout.rows.flat().filter(k => !k.isGap && !k.isEncoder);
-      const codes = allKeys.map(k => k.code);
-      expect(codes.length).toBeGreaterThan(0);
-      const knownCodes = codes.filter(c => !c.includes(',') && !c.startsWith('R'));
-      expect(knownCodes.length).toBeGreaterThan(0);
+    test('first row has ESC and F-keys from STANDARD_MATRIX', () => {
+      const keys = result.layout.rows[0].filter(k => !k.isGap);
+      const codes = keys.map(k => k.code);
+      expect(codes).toContain('ESC');
+      expect(codes).toContain('F3');
+      expect(codes).toContain('F6');
+    });
+
+    test('QWERTY row has TAB, Q, W, E, R, T on left side', () => {
+      const keys = result.layout.rows[2].filter(k => !k.isGap);
+      const leftCodes = keys.slice(0, 7).map(k => k.code);
+      expect(leftCodes).toContain('TAB');
+      expect(leftCodes).toContain('Q');
+      expect(leftCodes).toContain('W');
+      expect(leftCodes).toContain('T');
+    });
+
+    test('thumb cluster keys are merged into bottom rows', () => {
+      // Matrix positions 3,6 and 8,6 go to home row (row 3)
+      // Matrix positions 4,4-4,6 and 9,4-9,6 go to bottom row (row 4)
+      const row3keys = result.layout.rows[3].filter(k => !k.isGap);
+      const row4keys = result.layout.rows[4].filter(k => !k.isGap);
+      // Home row: 7 left (cols 0-6) + 7 right (cols 0-6) = 14
+      expect(row3keys.length).toBe(14);
+      // Bottom row: 4 left main + 3 thumb + 3 thumb + 4 right main = 14
+      expect(row4keys.length).toBe(14);
     });
 
     test('filters out non-default layout variant keys', () => {
       const allKeys = result.layout.rows.flat().filter(k => !k.isGap && !k.isEncoder);
-      // No key code should contain newline characters (variant labels must be stripped)
       const hasNewlines = allKeys.some(k => k.code.includes('\n'));
       expect(hasNewlines).toBe(false);
     });

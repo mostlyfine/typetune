@@ -111,7 +111,8 @@ export class ViaParser {
 
   #parseDefinition(data) {
     const kleRows = data.layouts.keymap;
-    const rows = this.#parseKle(kleRows);
+    const matrixRows = data.matrix?.rows;
+    const rows = this.#parseKle(kleRows, matrixRows);
 
     return {
       name: data.name || 'VIA Custom',
@@ -120,26 +121,37 @@ export class ViaParser {
     };
   }
 
-  // Parse KLE-format layout array into rows of key objects with proper widths
-  // Handles x offsets as gaps, matrix positions ("row,col") for QWERTY fallback
-  #parseKle(kleRows) {
-    const rows = [];
+  // Parse KLE-format layout array into rows of key objects with proper widths.
+  // Tracks absolute (x, y) positions to merge columnar-stagger KLE rows
+  // (negative y offsets) into proper keyboard rows.
+  // For rotated sections (rx/ry), uses matrix row to determine logical row.
+  #parseKle(kleRows, matrixRows) {
+    const allKeys = []; // { logicalRow, absX, key }
+    let cursorY = 0;
     let encoderCount = 0;
-    let encoderBuffer = [];
+    let inRotation = false;
+    let rotationRx = 0;
+    const halfRows = matrixRows && matrixRows % 2 === 0 ? matrixRows / 2 : 0;
 
     for (const kleRow of kleRows) {
-      // Skip metadata object (first element of first row in some KLE exports)
       if (!Array.isArray(kleRow)) continue;
 
-      const row = [];
+      let cursorX = 0;
       let props = {};
+      let encoderBuffer = [];
+      let encStartX = 0;
 
       for (const entry of kleRow) {
         if (typeof entry === 'object' && entry !== null) {
+          if ('ry' in entry) {
+            inRotation = true;
+            rotationRx = entry.rx ?? rotationRx;
+            cursorY = entry.ry;
+          }
+          if ('y' in entry) cursorY += entry.y;
+          if ('x' in entry) cursorX += entry.x;
           Object.assign(props, entry);
         } else if (typeof entry === 'string') {
-          // Parse layout variant info from multiline KLE labels
-          // Format: "row,col\n\n\noptionIdx,variantIdx"
           const lines = entry.split('\n');
           const label = lines[0];
           const variantInfo = lines[3];
@@ -153,22 +165,25 @@ export class ViaParser {
             }
           }
 
-          // Insert gap for horizontal offset
-          if (props.x && props.x >= 0.25) {
-            row.push({ code: '_GAP', w: props.x, isGap: true });
-          }
+          const absX = inRotation ? rotationRx + cursorX : cursorX;
 
           // Detect encoder rotation keys (h <= 0.5 in KLE = knob rotation)
           if (props.h && props.h <= 0.5) {
+            if (encoderBuffer.length === 0) encStartX = absX;
             encoderBuffer.push(label);
+            cursorX += (props.w || 1);
             if (encoderBuffer.length === 2) {
-              row.push({
-                code: `_ENC${encoderCount++}`,
-                w: 1,
-                isEncoder: true,
-                encoderPress: '',
-                encoderCCW: '',
-                encoderCW: '',
+              allKeys.push({
+                logicalRow: Math.floor(cursorY),
+                absX: encStartX,
+                key: {
+                  code: `_ENC${encoderCount++}`,
+                  w: 1,
+                  isEncoder: true,
+                  encoderPress: '',
+                  encoderCCW: '',
+                  encoderCW: '',
+                },
               });
               encoderBuffer = [];
             }
@@ -193,12 +208,52 @@ export class ViaParser {
             }
           }
 
-          row.push({ code, w });
+          // Determine logical row:
+          // - Rotation group with split matrix: use matrix row mapping
+          // - Otherwise: use floor(y)
+          let logicalRow;
+          if (inRotation && halfRows > 0) {
+            const posMatch = label.match(/^(\d+),(\d+)$/);
+            if (posMatch) {
+              const mRow = parseInt(posMatch[1]);
+              logicalRow = mRow < halfRows ? mRow : mRow - halfRows;
+            } else {
+              logicalRow = Math.floor(cursorY);
+            }
+          } else {
+            logicalRow = Math.floor(cursorY);
+          }
+
+          allKeys.push({ logicalRow, absX, key: { code, w } });
+          cursorX += w;
           props = {};
         }
       }
 
       encoderBuffer = [];
+      cursorY += 1;
+    }
+
+    // Group by logicalRow, sort by absX, insert gaps between keys
+    const groups = new Map();
+    for (const { logicalRow, absX, key } of allKeys) {
+      if (!groups.has(logicalRow)) groups.set(logicalRow, []);
+      groups.get(logicalRow).push({ absX, ...key });
+    }
+
+    const rows = [];
+    for (const [, keys] of [...groups].sort((a, b) => a[0] - b[0])) {
+      keys.sort((a, b) => a.absX - b.absX);
+      const row = [];
+      let prevEnd = 0;
+      for (const { absX, ...keyProps } of keys) {
+        const gap = absX - prevEnd;
+        if (gap >= 0.25) {
+          row.push({ code: '_GAP', w: gap, isGap: true });
+        }
+        row.push(keyProps);
+        prevEnd = absX + keyProps.w;
+      }
       if (row.length > 0) rows.push(row);
     }
 
