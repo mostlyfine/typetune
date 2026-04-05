@@ -22,6 +22,38 @@ function stripCols(rows, colsToStrip) {
   return rows.map(r => r.filter((_, c) => !colsToStrip.has(c)));
 }
 
+// Extract encoder key from encoder columns with rotation data from encoder_layout
+// Returns a single encoder key object or null
+function extractEncoderKey(rows, encCols, encoderLayout, encoderIndex) {
+  if (encCols.size === 0 || !encoderLayout || !encoderLayout.length) return null;
+
+  const baseEncoders = encoderLayout[0] || [];
+  const rotation = baseEncoders[encoderIndex] || [];
+  const ccw = rotation[0] ? resolveKeycode(rotation[0]) : null;
+  const cw = rotation[1] ? resolveKeycode(rotation[1]) : null;
+
+  // Find press key from any row in the encoder column
+  let pressCode = '';
+  for (const col of encCols) {
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][col] !== -1) {
+        pressCode = resolveKeycode(rows[i][col])?.code || '';
+        break;
+      }
+    }
+    if (pressCode) break;
+  }
+
+  return {
+    code: `_ENC${encoderIndex}`,
+    w: 1,
+    isEncoder: true,
+    encoderPress: pressCode,
+    encoderCCW: ccw?.code || '',
+    encoderCW: cw?.code || '',
+  };
+}
+
 // Estimate finger from physical position in a split keyboard half
 function fingerForPosition(side, row, col, totalRows, totalCols) {
   const prefix = side === 'left' ? 'l-' : 'r-';
@@ -97,6 +129,7 @@ export class VialParser {
 
   #parseVialSave(data) {
     const layerData = data.layout;
+    const encoderLayout = data.encoder_layout || [];
     const layers = layerData.map((layer, i) => ({
       id: String(i),
       name: `Layer ${i}`,
@@ -114,6 +147,12 @@ export class VialParser {
     const cleanLeft = stripCols(leftRows, leftEncCols);
     const cleanRight = stripCols(rightRows, rightEncCols);
 
+    // Extract encoder keys with rotation data
+    const leftEncoder = extractEncoderKey(leftRows, leftEncCols, encoderLayout, 0);
+    const rightEncoder = extractEncoderKey(rightRows, rightEncCols, encoderLayout, 1);
+    // Physical encoder row: just above thumb cluster (second-to-last row)
+    const encoderRow = half - 2;
+
     const BLANK_KEY = { code: '_GAP', w: 1, isGap: true };
     const resolveKey = kc => kc === -1 ? BLANK_KEY : resolveKeycode(kc);
 
@@ -121,7 +160,13 @@ export class VialParser {
     for (let i = 0; i < half; i++) {
       const left = cleanLeft[i].map(resolveKey);
       const right = [...cleanRight[i]].reverse().map(resolveKey);
-      if (left.some(k => !k.isGap) || right.some(k => !k.isGap)) {
+
+      if (i === encoderRow) {
+        if (leftEncoder) left.push(leftEncoder);
+        if (rightEncoder) right.unshift(rightEncoder);
+      }
+
+      if (left.some(k => !k.isGap && !k.isEncoder) || right.some(k => !k.isGap && !k.isEncoder)) {
         layoutRows.push([...left, GAP_KEY, ...right]);
       }
     }

@@ -49,6 +49,12 @@ export class Keyboard {
 
         if (key.isGap) {
           keyEl.classList.add('kb-gap');
+        } else if (key.isEncoder) {
+          keyEl.classList.add('kb-encoder');
+          const ccwLabel = ZMK_KEY_MAP[key.encoderCCW]?.label || key.encoderCCW;
+          const cwLabel = ZMK_KEY_MAP[key.encoderCW]?.label || key.encoderCW;
+          const pressLabel = ZMK_KEY_MAP[key.encoderPress]?.label || key.encoderPress;
+          keyEl.innerHTML = `<span class="enc-rot">\u21BA ${esc(ccwLabel)}</span><span class="enc-press">${esc(pressLabel)}</span><span class="enc-rot">\u21BB ${esc(cwLabel)}</span>`;
         } else if (key.isLayer || key.isUnknown || key.isTrans || key.isNone) {
           keyEl.classList.add(key.isLayer ? 'kb-layer' : 'kb-unknown');
           keyEl.textContent = key.code;

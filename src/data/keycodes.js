@@ -64,6 +64,12 @@ const KEYCODE_TO_INTERNAL = {
 
   // Media
   MUTE: 'MUTE', VOLD: 'VOLD', VOLU: 'VOLU',
+  // Mouse
+  BTN1: 'BTN1', MS_BTN1: 'BTN1', BTN2: 'BTN2', MS_BTN2: 'BTN2',
+  BTN3: 'BTN3', MS_BTN3: 'BTN3', BTN4: 'BTN4', MS_BTN4: 'BTN4',
+  BTN5: 'BTN5', MS_BTN5: 'BTN5',
+  WH_U: 'WH_U', MS_WH_UP: 'WH_U', WH_D: 'WH_D', MS_WH_DOWN: 'WH_D',
+  WH_L: 'WH_L', MS_WH_LEFT: 'WH_L', WH_R: 'WH_R', MS_WH_RIGHT: 'WH_R',
 
   // Transparent / No-op
   TRNS: '_TRANS', TRANSPARENT: '_TRANS',

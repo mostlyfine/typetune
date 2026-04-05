@@ -99,6 +99,13 @@ export const ZMK_KEY_MAP = {
   NUM_LOCK: { label: 'NumLk' },
   // Media
   MUTE: { label: 'Mute' }, VOLD: { label: 'Vol-' }, VOLU: { label: 'Vol+' },
+  // Mouse
+  BTN1: { label: 'Btn1' }, BTN2: { label: 'Btn2' }, BTN3: { label: 'Btn3' },
+  BTN4: { label: 'Btn4' }, BTN5: { label: 'Btn5' },
+  WH_U: { label: 'Wh\u2191' }, WH_D: { label: 'Wh\u2193' },
+  WH_L: { label: 'Wh\u2190' }, WH_R: { label: 'Wh\u2192' },
+  // International
+  INT_HENKAN: { label: '\u5909\u63DB' }, INT_MUHENKAN: { label: '\u7121\u5909\u63DB' },
 };
 
 // Reverse lookup: char -> { code, shift }

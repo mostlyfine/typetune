@@ -9,18 +9,29 @@ export function removeComments(text) {
 }
 
 export function buildSplitLayout(rows, name) {
-  const isSplit = rows.length > 0 &&
-    rows.every(r => r.length % 2 === 0 && r.length >= 4 && r.length <= 14);
+  if (rows.length === 0) return { name, rows };
 
-  if (!isSplit) {
-    return { name, rows };
-  }
+  // Determine half-size from even-length rows (handles keyboards with extra inner keys)
+  const evenLens = rows.map(r => r.length).filter(l => l % 2 === 0 && l >= 4 && l <= 14);
+  if (evenLens.length === 0) return { name, rows };
 
-  // Use the smallest row length to determine the standard half-size
-  // so that rows with more keys have their outer keys aligned
-  const half = Math.min(...rows.map(r => r.length)) / 2;
+  const half = Math.min(...evenLens) / 2;
+
+  // Verify: at least half the rows can be split with this half value
+  const splittable = rows.filter(r => r.length >= half + 1).length;
+  if (splittable < Math.ceil(rows.length / 2)) return { name, rows };
 
   const layoutRows = rows.map(keys => {
+    if (keys.length < 2 * half) {
+      // Short row (e.g., thumb cluster): split at half without overlap
+      const left = keys.slice(0, Math.min(half, keys.length));
+      const right = keys.slice(Math.min(half, keys.length));
+      if (right.length > 0) {
+        return [...left, { ...GAP_KEY }, ...right];
+      }
+      return [...left];
+    }
+    // Normal row: standard split with possible middle keys
     const left = keys.slice(0, half);
     const right = keys.slice(keys.length - half);
     const middle = keys.slice(half, keys.length - half);
