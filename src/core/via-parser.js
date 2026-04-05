@@ -124,6 +124,8 @@ export class ViaParser {
   // Handles x offsets as gaps, matrix positions ("row,col") for QWERTY fallback
   #parseKle(kleRows) {
     const rows = [];
+    let encoderCount = 0;
+    let encoderBuffer = [];
 
     for (const kleRow of kleRows) {
       // Skip metadata object (first element of first row in some KLE exports)
@@ -139,6 +141,24 @@ export class ViaParser {
           // Insert gap for horizontal offset
           if (props.x && props.x >= 0.25) {
             row.push({ code: '_GAP', w: props.x, isGap: true });
+          }
+
+          // Detect encoder rotation keys (h <= 0.5 in KLE = knob rotation)
+          if (props.h && props.h <= 0.5) {
+            encoderBuffer.push(entry);
+            if (encoderBuffer.length === 2) {
+              row.push({
+                code: `_ENC${encoderCount++}`,
+                w: 1,
+                isEncoder: true,
+                encoderPress: '',
+                encoderCCW: '',
+                encoderCW: '',
+              });
+              encoderBuffer = [];
+            }
+            props = {};
+            continue;
           }
 
           const w = props.w || 1;
@@ -163,6 +183,7 @@ export class ViaParser {
         }
       }
 
+      encoderBuffer = [];
       if (row.length > 0) rows.push(row);
     }
 
