@@ -53,10 +53,10 @@ describe('SettingsPanel', () => {
     expect(bar.classList.contains('sp-collapsed')).toBe(false);
   });
 
-  test('typing:start event collapses settings', () => {
+  test('typing:start event does not collapse settings', () => {
     bus.emit('typing:start', {});
     const bar = container.querySelector('.sp-bar');
-    expect(bar.classList.contains('sp-collapsed')).toBe(true);
+    expect(bar.classList.contains('sp-collapsed')).toBe(false);
   });
 
   test('sound button toggles sound', () => {
