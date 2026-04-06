@@ -1,5 +1,5 @@
 import { resolveKeycode } from '../data/keycodes.js';
-import { buildSplitLayout } from './parser-utils.js';
+import { buildSplitLayout, buildLayerCharMap } from './parser-utils.js';
 
 // Keys that typically start a keyboard row
 const ROW_START_KEYS = new Set([
@@ -48,7 +48,14 @@ export class ViaParser {
     const rows = this.#buildRows(baseLayer, cols);
     const layout = this.#buildLayout(rows);
 
-    return { name: data.name || 'VIA Custom', layers, layout };
+    const baseKeys = baseLayer.map(kc => resolveKeycode(kc));
+    const layerKeyArrays = layers.slice(1).map((layer, i) => ({
+      layerNum: i + 1,
+      keys: layer.keycodes.map(kc => resolveKeycode(kc)),
+    }));
+    const layerCharMap = buildLayerCharMap(baseKeys, layerKeyArrays);
+
+    return { name: data.name || 'VIA Custom', layers, layout, layerCharMap };
   }
 
   #detectCols(keycodes) {

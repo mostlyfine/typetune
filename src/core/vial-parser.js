@@ -1,5 +1,5 @@
 import { decodeVialKeycode, resolveKeycode, splitIntoRows } from '../data/keycodes.js';
-import { GAP_KEY, buildSplitLayout } from './parser-utils.js';
+import { GAP_KEY, buildSplitLayout, buildLayerCharMap } from './parser-utils.js';
 import { ViaParser } from './via-parser.js';
 import { ZMK_KEY_MAP } from '../data/key-labels.js';
 
@@ -114,10 +114,19 @@ export class VialParser {
     const rows = this.#detectRows(keys, data);
     const layout = this.#buildLayout(rows);
 
+    const layerKeyArrays = layers.slice(1).map((layer, i) => ({
+      layerNum: i + 1,
+      keys: layer.keycodes.map(kc =>
+        typeof kc === 'number' ? decodeVialKeycode(kc) : resolveKeycode(kc)
+      ),
+    }));
+    const layerCharMap = buildLayerCharMap(keys, layerKeyArrays);
+
     return {
       name: 'Vial Custom',
       layers,
       layout,
+      layerCharMap,
     };
   }
 

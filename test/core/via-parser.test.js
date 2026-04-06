@@ -44,6 +44,34 @@ describe('ViaParser', () => {
     expect(allKeys.every(k => !k.isNone)).toBe(true);
   });
 
+  test('builds layerCharMap from non-base layers', () => {
+    const data = {
+      layers: [
+        ['KC_A', 'KC_B', 'KC_C', 'MO(1)'],
+        ['KC_1', 'KC_2', 'KC_TRNS', 'KC_TRNS'],
+      ],
+    };
+    const result = parser.parse(data);
+    expect(result.layerCharMap).toBeDefined();
+    expect(result.layerCharMap['1']).toEqual({
+      activator: 'MO(1)',
+      targetCode: 'A',
+    });
+    expect(result.layerCharMap['!']).toEqual({
+      activator: 'MO(1)',
+      targetCode: 'A',
+      shift: true,
+    });
+  });
+
+  test('returns empty layerCharMap for single-layer keymap', () => {
+    const data = {
+      layers: [['KC_A', 'KC_B', 'KC_C', 'KC_D']],
+    };
+    const result = parser.parse(data);
+    expect(result.layerCharMap).toEqual({});
+  });
+
   test('throws for JSON without layers or layouts', () => {
     expect(() => parser.parse({ name: 'empty' }))
       .toThrow('No layers or layouts found');

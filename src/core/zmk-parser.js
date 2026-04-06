@@ -1,5 +1,5 @@
 import { ZMK_KEY_MAP } from '../data/key-labels.js';
-import { removeComments, buildSplitLayout } from './parser-utils.js';
+import { removeComments, buildSplitLayout, buildLayerCharMap } from './parser-utils.js';
 
 // ZMK keycode aliases -> canonical form used in ZMK_KEY_MAP
 const ZMK_ALIASES = {
@@ -72,10 +72,18 @@ export class ZmkParser {
     const bindingRows = this.#parseBindingRows(layers[0].bindings);
     const layout = this.#buildLayoutFromRows(bindingRows, encoderKeys);
 
+    const baseKeys = bindingRows.flat().map(b => this.#bindingToKey(b));
+    const layerKeyArrays = layers.slice(1).map((layer, i) => ({
+      layerNum: i + 1,
+      keys: this.#parseBindingRows(layer.bindings).flat().map(b => this.#bindingToKey(b)),
+    }));
+    const layerCharMap = buildLayerCharMap(baseKeys, layerKeyArrays);
+
     return {
       name: layers[0].name || 'ZMK Custom',
       layers,
       layout,
+      layerCharMap,
     };
   }
 

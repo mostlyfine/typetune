@@ -1,6 +1,51 @@
 // Shared utilities for keymap parsers
 
+import { ZMK_KEY_MAP } from '../data/key-labels.js';
+
 export const GAP_KEY = { code: '_GAP', w: 0.5, isGap: true };
+
+// Build layerCharMap from resolved key arrays
+// baseKeys: flat array of resolved key objects from base layer
+// layerKeyArrays: [{ layerNum, keys: [...] }, ...]
+// Returns: { char: { activator, targetCode, shift? } }
+export function buildLayerCharMap(baseKeys, layerKeyArrays) {
+  const charMap = {};
+  const activators = new Map(); // layerNum -> activator code
+  const baseChars = new Set();
+
+  for (const key of baseKeys) {
+    if (key.isLayer) {
+      const m = key.code.match(/^(?:MO|TG|TT|TO|OSL)\((\d+)\)$/);
+      if (m) activators.set(parseInt(m[1]), key.code);
+    }
+    if (key.layerTap !== undefined && !activators.has(key.layerTap)) {
+      activators.set(key.layerTap, key.code);
+    }
+    const info = ZMK_KEY_MAP[key.code];
+    if (info?.char) baseChars.add(info.char);
+    if (info?.shiftChar) baseChars.add(info.shiftChar);
+  }
+
+  for (const { layerNum, keys } of layerKeyArrays) {
+    const act = activators.get(layerNum);
+    if (!act) continue;
+    for (let i = 0; i < keys.length && i < baseKeys.length; i++) {
+      const lk = keys[i];
+      const bk = baseKeys[i];
+      if (lk.isTrans || lk.isNone || lk.isLayer) continue;
+      const info = ZMK_KEY_MAP[lk.code];
+      if (!info) continue;
+      if (info.char && !baseChars.has(info.char) && !charMap[info.char]) {
+        charMap[info.char] = { activator: act, targetCode: bk.code };
+      }
+      if (info.shiftChar && !baseChars.has(info.shiftChar) && !charMap[info.shiftChar]) {
+        charMap[info.shiftChar] = { activator: act, targetCode: bk.code, shift: true };
+      }
+    }
+  }
+
+  return charMap;
+}
 
 export function removeComments(text) {
   return text

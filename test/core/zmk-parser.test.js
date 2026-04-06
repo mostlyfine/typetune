@@ -390,6 +390,48 @@ describe('ZmkParser', () => {
     });
   });
 
+  test('builds layerCharMap from non-base layers', () => {
+    const keymap = `
+/ {
+  keymap {
+    compatible = "zmk,keymap";
+    base {
+      bindings = <
+        &kp A &kp B &kp C &kp D
+        &mo 1 &kp SPACE &kp ENTER &kp BSPC
+      >;
+    };
+    num_layer {
+      bindings = <
+        &kp N1 &kp N2 &kp N3 &kp LBKT
+        &trans &trans &trans &trans
+      >;
+    };
+  };
+};`;
+    const result = parser.parse(keymap);
+    expect(result.layerCharMap).toBeDefined();
+    expect(result.layerCharMap['1']).toEqual({
+      activator: 'MO(1)',
+      targetCode: 'A',
+    });
+    expect(result.layerCharMap['[']).toEqual({
+      activator: 'MO(1)',
+      targetCode: 'D',
+    });
+    expect(result.layerCharMap['!']).toEqual({
+      activator: 'MO(1)',
+      targetCode: 'A',
+      shift: true,
+    });
+  });
+
+  test('builds layerCharMap with layer-tap activator', () => {
+    const result = parser.parse(minimalKeymap);
+    expect(result.layerCharMap).toBeDefined();
+    expect(typeof result.layerCharMap).toBe('object');
+  });
+
   test('strips comments before parsing', () => {
     const commentKeymap = `
 // This is a comment

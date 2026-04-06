@@ -276,6 +276,21 @@ describe('VialParser', () => {
     });
   });
 
+  test('builds layerCharMap from non-save format layers', () => {
+    const data = {
+      layers: [
+        ['KC_A', 'KC_B', 'KC_C', 'MO(1)'],
+        ['KC_1', 'KC_2', 'KC_TRNS', 'KC_TRNS'],
+      ],
+    };
+    const result = parser.parse(data);
+    expect(result.layerCharMap).toBeDefined();
+    expect(result.layerCharMap['1']).toEqual({
+      activator: 'MO(1)',
+      targetCode: 'A',
+    });
+  });
+
   test('handles layer activators (MO, TG, layerTap)', () => {
     const data = {
       layout: [
