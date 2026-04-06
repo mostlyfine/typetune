@@ -183,7 +183,10 @@ export class TypingEngine {
   }
 
   #calcStats() {
-    const elapsedSec = this.#startTime ? (Date.now() - this.#startTime) / 1000 : 0;
+    let elapsedSec = this.#startTime ? (Date.now() - this.#startTime) / 1000 : 0;
+    if (this.#mode === 'time' && elapsedSec > this.#timeLimit) {
+      elapsedSec = this.#timeLimit;
+    }
     const wpm = elapsedSec > 0 ? Math.round((this.#correctCount / 5) / (elapsedSec / 60)) : 0;
     const accuracy = this.#inputCount > 0
       ? Math.round((this.#correctCount / this.#inputCount) * 1000) / 10

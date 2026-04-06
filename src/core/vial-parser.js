@@ -1,5 +1,5 @@
 import { decodeVialKeycode, resolveKeycode, splitIntoRows } from '../data/keycodes.js';
-import { GAP_KEY, buildSplitLayout, buildLayerCharMap } from './parser-utils.js';
+import { GAP_KEY, buildSplitLayout, buildLayerCharMap, LAYER_ACTIVATOR_RE } from './parser-utils.js';
 import { ViaParser } from './via-parser.js';
 import { ZMK_KEY_MAP } from '../data/key-labels.js';
 
@@ -209,7 +209,7 @@ export class VialParser {
           const key = resolve(rows[i][c]);
           if (!key) continue;
           if (key.isLayer) {
-            const m = key.code.match(/^(?:MO|TG|TT|TO|OSL)\((\d+)\)$/);
+            const m = key.code.match(LAYER_ACTIVATOR_RE);
             if (m) {
               const finger = fingerForPosition(side, i, c, half, totalCols);
               activators.set(parseInt(m[1]), { code: key.code, finger });

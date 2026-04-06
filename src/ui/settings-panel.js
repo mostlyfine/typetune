@@ -177,9 +177,11 @@ export class SettingsPanel {
         modeValue.hidden = true;
         modeUnit.hidden = true;
       }
-      this.#applyMode();
-      this.#bus.emit('text:loaded', { text: this.#engine.text, source: 'mode-change' });
-      this.#engine.start();
+      this.#reloadMode();
+    });
+
+    modeValue.addEventListener('change', () => {
+      this.#reloadMode();
     });
 
     // Keymap file upload
@@ -209,6 +211,12 @@ export class SettingsPanel {
     } catch (e) {
       alert(`Failed to parse keymap: ${e.message}`);
     }
+  }
+
+  #reloadMode() {
+    this.#applyMode();
+    this.#bus.emit('text:loaded', { text: this.#engine.text, source: 'mode-change' });
+    this.#engine.start();
   }
 
   #applyMode() {

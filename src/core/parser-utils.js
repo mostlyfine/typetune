@@ -4,6 +4,8 @@ import { ZMK_KEY_MAP } from '../data/key-labels.js';
 
 export const GAP_KEY = { code: '_GAP', w: 0.5, isGap: true };
 
+export const LAYER_ACTIVATOR_RE = /^(?:MO|TG|TT|TO|OSL)\((\d+)\)$/;
+
 // Build layerCharMap from resolved key arrays
 // baseKeys: flat array of resolved key objects from base layer
 // layerKeyArrays: [{ layerNum, keys: [...] }, ...]
@@ -15,7 +17,7 @@ export function buildLayerCharMap(baseKeys, layerKeyArrays) {
 
   for (const key of baseKeys) {
     if (key.isLayer) {
-      const m = key.code.match(/^(?:MO|TG|TT|TO|OSL)\((\d+)\)$/);
+      const m = key.code.match(LAYER_ACTIVATOR_RE);
       if (m) activators.set(parseInt(m[1]), key.code);
     }
     if (key.layerTap !== undefined && !activators.has(key.layerTap)) {

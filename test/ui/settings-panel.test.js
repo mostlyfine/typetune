@@ -85,6 +85,24 @@ describe('SettingsPanel', () => {
     expect(valueInput.hidden).toBe(true);
   });
 
+  test('mode value input change applies new value', () => {
+    const mode = container.querySelector('#sp-mode');
+    const valueInput = container.querySelector('#sp-mode-value');
+
+    // Select time-custom mode first
+    mode.value = 'time-custom';
+    mode.dispatchEvent(new Event('change'));
+    mockEngine.setMode.mockClear();
+    mockEngine.start.mockClear();
+
+    // Change the input value
+    valueInput.value = '30';
+    valueInput.dispatchEvent(new Event('change'));
+
+    expect(mockEngine.setMode).toHaveBeenCalledWith('time', 30);
+    expect(mockEngine.start).toHaveBeenCalled();
+  });
+
   test('preset selection generates practice text', () => {
     const preset = container.querySelector('#sp-preset');
     preset.value = 'right-hand';

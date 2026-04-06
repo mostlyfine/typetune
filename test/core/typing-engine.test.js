@@ -216,6 +216,21 @@ describe('TypingEngine', () => {
     expect(completeSpy).toHaveBeenCalled();
   });
 
+  test('time mode duration is capped at timeLimit', () => {
+    engine.setMode('time', 1); // 1 second
+    engine.setText('abcdef');
+    engine.start();
+    const completeSpy = vi.fn();
+    bus.on('typing:complete', completeSpy);
+    keydown(' ');
+    // Simulate interval firing 200ms late (1.2s elapsed)
+    vi.setSystemTime(Date.now() + 1200);
+    vi.advanceTimersByTime(1200);
+    expect(completeSpy).toHaveBeenCalled();
+    const stats = completeSpy.mock.calls[0][0];
+    expect(stats.duration).toBe(1);
+  });
+
   test('emits typing:progress with payload', () => {
     engine.setText('abc');
     engine.start();

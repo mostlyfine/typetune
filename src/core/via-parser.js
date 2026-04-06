@@ -45,10 +45,10 @@ export class ViaParser {
 
     const baseLayer = layers[0].keycodes;
     const cols = data.matrix?.cols || data.cols || this.#detectCols(baseLayer);
-    const rows = this.#buildRows(baseLayer, cols);
+    const baseKeys = baseLayer.map(kc => resolveKeycode(kc));
+    const rows = this.#buildRowsFromKeys(baseKeys, cols);
     const layout = this.#buildLayout(rows);
 
-    const baseKeys = baseLayer.map(kc => resolveKeycode(kc));
     const layerKeyArrays = layers.slice(1).map((layer, i) => ({
       layerNum: i + 1,
       keys: layer.keycodes.map(kc => resolveKeycode(kc)),
@@ -100,12 +100,11 @@ export class ViaParser {
     return bestCols;
   }
 
-  #buildRows(keycodes, cols) {
+  #buildRowsFromKeys(resolvedKeys, cols) {
     const rows = [];
-    for (let i = 0; i < keycodes.length; i += cols) {
-      const rawRow = keycodes.slice(i, i + cols);
-      const keys = rawRow.map(kc => resolveKeycode(kc)).filter(k => !k.isNone);
-      if (keys.length > 0) rows.push(keys);
+    for (let i = 0; i < resolvedKeys.length; i += cols) {
+      const row = resolvedKeys.slice(i, i + cols).filter(k => !k.isNone);
+      if (row.length > 0) rows.push(row);
     }
     return rows;
   }
