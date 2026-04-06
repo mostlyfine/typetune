@@ -59,7 +59,7 @@ export class StatsDisplay {
   #showResult({ wpm, accuracy, errors, duration }) {
     this.#els.result.hidden = false;
     this.#els.result.innerHTML = `
-      <div class="result-title">Complete!</div>
+      <div class="result-title">Finish!</div>
       <div class="result-stats">
         <span><strong>${wpm}</strong> WPM</span>
         <span><strong>${accuracy}%</strong> Accuracy</span>

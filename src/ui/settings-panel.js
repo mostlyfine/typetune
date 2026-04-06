@@ -178,6 +178,9 @@ export class SettingsPanel {
         modeValue.hidden = true;
         modeUnit.hidden = true;
       }
+      this.#applyMode();
+      this.#bus.emit('text:loaded', { text: this.#engine.text, source: 'mode-change' });
+      this.#engine.start();
     });
 
     // Keymap file upload

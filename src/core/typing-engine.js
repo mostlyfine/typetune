@@ -88,6 +88,10 @@ export class TypingEngine {
   #handleKeydown = (e) => {
     if (e.isComposing) return;
 
+    // Ignore events from form elements
+    const tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+
     // Ignore modifier-only keys
     if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return;
 
