@@ -26,8 +26,8 @@ A typing practice app designed for custom keyboard enthusiasts. Load your own ke
 ### Install
 
 ```bash
-git clone https://github.com/mostlyfine/typing.git
-cd typing
+git clone https://github.com/mostlyfine/typetune.git
+cd typetune
 npm install
 ```
 
