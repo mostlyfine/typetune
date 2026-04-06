@@ -7,7 +7,7 @@ export class TextDisplay {
   #position = 0;
   #errors = new Set();
   #skipPositions = new Set();
-  #visibleLines = 8;
+  #visibleLines = 9;
   #lines = [];         // cached line split
   #lineStarts = [];    // char index where each line starts
   #spanEls = [];       // flat array of span elements by char position
