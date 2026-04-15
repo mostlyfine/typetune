@@ -49,13 +49,16 @@
 .result-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px 12px;
-  font-size: 13px;
-  color: var(--text);
+  gap: 8px 12px;
+  font-size: 14px;
+  color: var(--text-dim);
   text-align: center;
 }
 
 .result-stats strong {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text-bright);
 }
 

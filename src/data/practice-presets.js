@@ -4,68 +4,32 @@ import { ZMK_KEY_MAP } from './key-labels.js';
 // Finger-pair word lists: 4-10 chars, max 1 char outside the finger's keys
 // Words selected for: commonality, balanced key coverage, length variety
 
-// Pinky: q, a, z, p — very limited alphabet
 const PINKY_WORDS = [
-  'aqua', 'jazz', 'papa', 'razz', 'pupa', 'napa',
-  'pizza', 'plaza', 'papal', 'pappy', 'poppa', 'kappa',
-  'papaya', 'piazza',
+  'aqua', 'quiz', 'apply', 'plaza', 'zip', 'quartz', 'apex', 'page',
+  'ajax', 'proxy', 'zap', 'apple', 'zoom', 'pizza', 'appendix', 'lazy',
+  'span', 'azure', 'alpha', 'space', 'quest', 'zebra', 'quasi', 'analyze',
+  'puzzle', 'quality', 'zappa', 'asap', 'opaque',
 ];
 
-// Ring: w, s, x, o, l — x is rare; oxbow covers it
 const RING_WORDS = [
-  // 4 chars (w,s,o,l well covered)
-  'also', 'blow', 'boss', 'bowl', 'cool', 'doll', 'flow', 'fool',
-  'glow', 'less', 'look', 'loop', 'loss', 'lost', 'moss', 'poll',
-  'pool', 'roll', 'slow', 'snow',
-  // 5 chars (x via oxbow)
-  'allow', 'bowls', 'floss', 'gloss', 'loose', 'lowly', 'oxbow', 'scowl',
-  'sloop', 'slosh', 'shows', 'spool', 'stool', 'swell', 'swill', 'swoon',
-  'tolls', 'tools', 'walls', 'wells',
-  // 6 chars
-  'follow', 'hollow', 'lollop', 'powwow', 'sallow', 'slowly', 'swoosh',
-  'wallow', 'willow', 'woolly',
-  // 7 chars
-  'swallow',
+  'slow', 'windows', 'logs', 'scroll', 'down', 'low', 'linux', 'solo',
+  'tools', 'sql', 'world', 'loss', 'local', 'wool', 'wood', 'follow',
+  'small', 'oxide', 'swallow', 'allow', 'pools', 'solve', 'swell', 'slowly',
+  'swirl', 'solid', 'loose', 'scrolls', 'workflow',
 ];
 
-// Middle: e, d, c, i, k — k is rarest; kick/deck/pick cover it
 const MIDDLE_WORDS = [
-  // 4 chars (all keys well covered)
-  'bike', 'cake', 'code', 'dead', 'deck', 'deed', 'deep', 'deer',
-  'desk', 'dice', 'dike', 'dime', 'dine', 'disc', 'dock', 'duck',
-  'duke', 'edge', 'kick', 'kind',
-  // 5 chars (k via check/click/cheek)
-  'added', 'check', 'cheek', 'chick', 'chide', 'cider', 'civic', 'click',
-  'creed', 'creek', 'diced', 'dried', 'edict', 'kneed', 'liked', 'niece',
-  'piece', 'sided', 'skied', 'tided',
-  // 6 chars (k via kicked/picked/decked/necked)
-  'accede', 'acidic', 'decade', 'deceit', 'decide', 'decked', 'decode',
-  'decree', 'deduce', 'device', 'exceed', 'indeed', 'kicked', 'necked',
-  'picked', 'recede', 'secede', 'wicked',
-  // 7 chars
-  'checked', 'decided', 'deceive', 'decried', 'divided', 'edifice',
+  'edit', 'code', 'index', 'click', 'iced', 'deck', 'kind', 'dice',
+  'icon', 'cited', 'link', 'edge', 'kinetic', 'dev', 'icing', 'device',
+  'check', 'kick', 'dock', 'decide', 'dedicate', 'circle', 'did', 'engine',
+  'client', 'king', 'coding', 'cookie',
 ];
 
-// Index: r, t, f, g, v, b, y, u, h, j, n, m — j,v are rarest
 const INDEX_WORDS = [
-  // 4 chars (j via jump/jury/just, v via vary/verb/navy/envy)
-  'army', 'baby', 'bang', 'barn', 'bath', 'bomb', 'burn', 'bury',
-  'envy', 'from', 'fury', 'gang', 'gift', 'high', 'hung', 'hurt',
-  'hymn', 'jump', 'jury', 'myth',
-  // 5 chars (j via jumpy/joint, v via gravy)
-  'birth', 'bring', 'brunt', 'brush', 'bunch', 'buyer', 'entry', 'fifty',
-  'fight', 'forum', 'fruit', 'funny', 'gravy', 'grunt', 'hurry', 'jumpy',
-  'might', 'month', 'rugby', 'thumb',
-  // 6 chars (j via jaunty→7, v via virtue→6 no... v via vanity? v,a,n,i,t,y - a miss, i miss = 2. Invalid)
-  'autumn', 'bounty', 'bright', 'buffer', 'butter', 'fluffy', 'fourth',
-  'fright', 'gritty', 'hungry', 'hunter', 'jaunty', 'mighty', 'mutiny',
-  'number', 'return', 'rhythm', 'rubber', 'thorny', 'thrust',
-  // 7 chars (j via juryman, v via viburnum→8)
-  'brought', 'bunting', 'burnout', 'burning', 'buttery', 'further',
-  'gruffly', 'humming', 'hunting', 'naughty', 'running', 'thrifty',
-  'thought', 'through', 'turnout', 'turning',
-  // 8 chars
-  'burgundy', 'sunburnt', 'truthful',
+  'run', 'git', 'graph', 'hard', 'burn', 'unit', 'night', 'bright',
+  'hunt', 'fruit', 'thumb', 'turn', 'might', 'bring', 'thin', 'truth',
+  'rough', 'guard', 'front', 'hymn', 'fight', 'rhythm', 'habit', 'right',
+  'mount', 'thought', 'brought', 'vibrant', 'number',
 ];
 
 // Left hand: q,a,z,w,s,x,e,d,c,r,t,f,g,v,b (+1 miss), ~20 per length
