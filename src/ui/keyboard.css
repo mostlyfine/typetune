@@ -20,8 +20,9 @@
 
 .kb-key {
   --w: 1;
-  width: calc(var(--w) * 44px);
-  height: 44px;
+  --kb-unit: clamp(44px, 3.2vw, 64px);
+  width: calc(var(--w) * var(--kb-unit));
+  height: var(--kb-unit);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,7 +31,7 @@
   border: 1px solid var(--key-border);
   border-radius: 6px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: clamp(13px, 1.0vw, 18px);
   color: var(--text);
   user-select: none;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
@@ -47,7 +48,7 @@
 }
 
 .kb-shift-label {
-  font-size: 10px;
+  font-size: clamp(10px, 0.8vw, 14px);
   line-height: 1;
   color: var(--text-dim);
   position: absolute;
@@ -60,7 +61,7 @@
 }
 
 .kb-main-label {
-  font-size: 14px;
+  font-size: clamp(14px, 1.1vw, 20px);
 }
 
 /* Gap/spacer for split keyboards */

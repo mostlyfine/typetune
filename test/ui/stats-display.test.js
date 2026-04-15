@@ -13,25 +13,26 @@ describe('StatsDisplay', () => {
     new StatsDisplay(bus, container);
   });
 
-  test('builds stats bar with WPM, accuracy, errors, remaining', () => {
-    expect(container.querySelector('[data-stat="wpm"]')).not.toBeNull();
-    expect(container.querySelector('[data-stat="accuracy"]')).not.toBeNull();
-    expect(container.querySelector('[data-stat="errors"]')).not.toBeNull();
+  test('builds stats bar with elapsed and remaining only', () => {
+    expect(container.querySelector('[data-stat="elapsed"]')).not.toBeNull();
     expect(container.querySelector('[data-stat="remaining"]')).not.toBeNull();
+    expect(container.querySelector('[data-stat="wpm"]')).toBeNull();
+    expect(container.querySelector('[data-stat="accuracy"]')).toBeNull();
+    expect(container.querySelector('[data-stat="errors"]')).toBeNull();
   });
 
-  test('typing:progress updates displayed values', () => {
-    bus.emit('typing:progress', { wpm: 60, accuracy: 95.5, errors: 3, remaining: 42 });
-    expect(container.querySelector('[data-stat="wpm"]').textContent).toBe('60');
-    expect(container.querySelector('[data-stat="accuracy"]').textContent).toBe('95.5%');
-    expect(container.querySelector('[data-stat="errors"]').textContent).toBe('3');
+  test('typing:progress updates elapsed and remaining', () => {
+    bus.emit('typing:progress', { wpm: 60, accuracy: 95.5, errors: 3, elapsed: 12, remaining: 42 });
+    expect(container.querySelector('[data-stat="elapsed"]').textContent).toBe('12s');
     expect(container.querySelector('[data-stat="remaining"]').textContent).toBe('42');
   });
 
-  test('typing:complete shows result panel', () => {
+  test('typing:complete shows result panel and hides stats bar', () => {
     bus.emit('typing:complete', { wpm: 80, accuracy: 98, errors: 2, duration: 30.5 });
     const result = container.querySelector('[data-stat="result"]');
+    const bar = container.querySelector('.stats-bar');
     expect(result.hidden).toBe(false);
+    expect(bar.hidden).toBe(true);
     expect(result.innerHTML).toContain('80');
     expect(result.innerHTML).toContain('98%');
     expect(result.innerHTML).toContain('30.5s');
@@ -51,12 +52,13 @@ describe('StatsDisplay', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  test('text:loaded resets all values', () => {
-    bus.emit('typing:progress', { wpm: 60, accuracy: 95, errors: 3, remaining: 42 });
+  test('text:loaded resets values and restores bar', () => {
+    bus.emit('typing:progress', { elapsed: 12, remaining: 42 });
+    bus.emit('typing:complete', { wpm: 80, accuracy: 98, errors: 2, duration: 30 });
     bus.emit('text:loaded', {});
-    expect(container.querySelector('[data-stat="wpm"]').textContent).toBe('0');
-    expect(container.querySelector('[data-stat="accuracy"]').textContent).toBe('100%');
-    expect(container.querySelector('[data-stat="errors"]').textContent).toBe('0');
+    expect(container.querySelector('[data-stat="elapsed"]').textContent).toBe('0s');
     expect(container.querySelector('[data-stat="remaining"]').textContent).toBe('-');
+    expect(container.querySelector('.stats-bar').hidden).toBe(false);
+    expect(container.querySelector('[data-stat="result"]').hidden).toBe(true);
   });
 });

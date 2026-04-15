@@ -57,7 +57,7 @@ body {
 
 #app {
   width: 100%;
-  max-width: 1200px;
+  max-width: min(1800px, 95vw);
   padding: 24px 16px;
   display: flex;
   gap: 16px;

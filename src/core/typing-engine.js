@@ -195,7 +195,7 @@ export class TypingEngine {
   }
 
   #emitProgress() {
-    const { wpm, accuracy } = this.#calcStats();
+    const { wpm, accuracy, elapsedSec } = this.#calcStats();
 
     this.#bus.emit('typing:progress', {
       position: this.#position,
@@ -205,6 +205,7 @@ export class TypingEngine {
       errors: this.#errors.length,
       correctCount: this.#correctCount,
       inputCount: this.#inputCount,
+      elapsed: Math.floor(elapsedSec),
       remaining: this.#getRemaining(),
     });
   }

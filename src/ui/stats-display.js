@@ -18,16 +18,8 @@ export class StatsDisplay {
     this.#container.innerHTML = `
       <div class="stats-bar">
         <div class="stat">
-          <span class="stat-label">WPM</span>
-          <span class="stat-value" data-stat="wpm">0</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Accuracy</span>
-          <span class="stat-value" data-stat="accuracy">100%</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Errors</span>
-          <span class="stat-value" data-stat="errors">0</span>
+          <span class="stat-label">Time</span>
+          <span class="stat-value" data-stat="elapsed">0s</span>
         </div>
         <div class="stat">
           <span class="stat-label">Remaining</span>
@@ -38,25 +30,24 @@ export class StatsDisplay {
     `;
 
     this.#els = {
-      wpm: this.#container.querySelector('[data-stat="wpm"]'),
-      accuracy: this.#container.querySelector('[data-stat="accuracy"]'),
-      errors: this.#container.querySelector('[data-stat="errors"]'),
+      bar: this.#container.querySelector('.stats-bar'),
+      elapsed: this.#container.querySelector('[data-stat="elapsed"]'),
       remaining: this.#container.querySelector('[data-stat="remaining"]'),
       result: this.#container.querySelector('[data-stat="result"]'),
     };
   }
 
-  #update({ wpm, accuracy, errors, remaining }) {
-    this.#els.wpm.textContent = wpm;
-    this.#els.accuracy.textContent = `${accuracy}%`;
-    this.#els.errors.textContent = errors;
-
+  #update({ elapsed, remaining }) {
+    if (typeof elapsed === 'number') {
+      this.#els.elapsed.textContent = `${elapsed}s`;
+    }
     if (typeof remaining === 'number') {
       this.#els.remaining.textContent = remaining;
     }
   }
 
   #showResult({ wpm, accuracy, errors, duration }) {
+    this.#els.bar.hidden = true;
     this.#els.result.hidden = false;
     this.#els.result.innerHTML = `
       <div class="result-title">Finish!</div>
@@ -74,10 +65,9 @@ export class StatsDisplay {
   }
 
   #reset() {
-    this.#els.wpm.textContent = '0';
-    this.#els.accuracy.textContent = '100%';
-    this.#els.errors.textContent = '0';
+    this.#els.elapsed.textContent = '0s';
     this.#els.remaining.textContent = '-';
+    this.#els.bar.hidden = false;
     this.#els.result.hidden = true;
   }
 }
