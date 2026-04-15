@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "typetune",
+  "compatibility_date": "2025-04-23",
+  "assets": {
+    "directory": "./dist"
+  }
+}
